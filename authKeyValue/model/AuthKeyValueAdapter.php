@@ -28,30 +28,23 @@
  */
 
 namespace oat\authKeyValue\model;
+
 use common_persistence_AdvKeyValuePersistence;
 use common_user_auth_Adapter;
 use helpers_PasswordHash;
 use core_kernel_users_InvalidLoginException;
 use common_session_BasicSession;
+use core_kernel_users_AuthAdapter;
 
-
+/**
+ * Adapter to authenticate users stored in the key value implementation
+ * 
+ * @author Christophe Massin <christope@taotesting.com>
+ *
+ */
 class AuthKeyValueAdapter implements common_user_auth_Adapter
 {
-    CONST LEGACY_ALGORITHM = 'md5';
-    CONST LEGACY_SALT_LENGTH = 0;
-
-    /**
-     * Returns the hashing algorithm defined in generis configuration
-     * 
-     * @return helpers_PasswordHash
-     */
-    public static function getPasswordHash() {
-        return new helpers_PasswordHash(
-            defined('PASSWORD_HASH_ALGORITHM') ? PASSWORD_HASH_ALGORITHM : self::LEGACY_ALGORITHM,
-            defined('PASSWORD_HASH_SALT_LENGTH') ? PASSWORD_HASH_SALT_LENGTH : self::LEGACY_SALT_LENGTH
-        );
-    }
-
+    CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue';
 
     private $username;
     private $password;
@@ -72,11 +65,11 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
      */
     public function authenticate() {
 
-       $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence("keyValueUser");
+       $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(self::KEY_VALUE_PERSISTENCE_ID);
         // login will always be unique due to redis and his unique keys access system.
         $userData = $kvStore->getDriver()->hGetAll($this->username);
 
-        $hashing = $this->getPasswordHash();
+        $hashing = core_kernel_users_AuthAdapter::getPasswordHash();
 
         if( isset($userData[PROPERTY_USER_PASSWORD]) && $hashing->verify($this->password, $userData[PROPERTY_USER_PASSWORD]))
         {

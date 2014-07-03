@@ -94,7 +94,7 @@ class AuthKeyValue extends \tao_actions_CommonModule {
 
     public function databaseMigration() {
 
-        $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence("keyValueUser");
+        $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
         $service = tao_models_classes_UserService::singleton();
         $users = $service->getAllUsers();
 

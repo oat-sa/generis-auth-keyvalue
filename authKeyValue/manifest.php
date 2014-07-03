@@ -35,6 +35,7 @@ return array(
 	'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#authKeyValueManager',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#authKeyValueManager', array('ext'=>'authKeyValue')),
+        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole',array('ext'=>'authKeyValue','mod' => 'AuthKeyValue', 'act' => 'index'))
     ),
     'uninstall' => array(
     ),
