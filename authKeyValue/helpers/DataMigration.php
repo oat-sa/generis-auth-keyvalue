@@ -58,7 +58,7 @@ class DataMigration {
 
     }
 
-    public static function generateRedisUser()
+    public static function generateKeyValueUser()
     {
         $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
 
