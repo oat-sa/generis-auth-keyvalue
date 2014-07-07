@@ -109,18 +109,6 @@ class AuthKeyValueUser extends common_user_User {
     }
 
 
-    public function initRoles(){
-        $returnValue = array();
-        // We use a Depth First Search approach to flatten the Roles Graph.
-        foreach ($this->getPropertyValues(PROPERTY_USER_ROLES) as $roleUri){
-            $returnValue[] = $roleUri;
-            foreach (core_kernel_users_Service::singleton()->getIncludedRoles(new core_kernel_classes_Resource($roleUri)) as $role) {
-                $returnValue[] = $role->getUri();
-            }
-        }
-        return array_unique($returnValue);
-    }
-
     public function getRoles() {
         return $this->roles;
     }

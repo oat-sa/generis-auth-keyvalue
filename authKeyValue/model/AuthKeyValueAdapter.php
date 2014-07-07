@@ -44,7 +44,7 @@ use core_kernel_users_AuthAdapter;
  */
 class AuthKeyValueAdapter implements common_user_auth_Adapter
 {
-    CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue';
+    CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue:user';
 
     private $username;
     private $password;
@@ -75,10 +75,9 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
         {
             // user is authentified, create the user for the session
 
-            $userParameters = json_decode($userData['parameters']);
-            $params = get_object_vars($userParameters);
+            $params = json_decode($userData['parameters'],true);
             $user = new AuthKeyValueUser();
-            $user->setIdentifier($userParameters->uri);
+            $user->setIdentifier($params->uri);
             $user->setRoles($params[PROPERTY_USER_ROLES]);
             $user->setLanguage($params[PROPERTY_USER_UILG]);
             $user->setUserRawParameters($params);
