@@ -68,7 +68,7 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
 
             $params = json_decode($userData['parameters'],true);
             $user = new AuthKeyValueUser();
-            $user->setIdentifier($params->uri);
+            $user->setIdentifier($params['uri'];
             $user->setRoles($params[PROPERTY_USER_ROLES]);
             $user->setLanguage($params[PROPERTY_USER_UILG]);
             $user->setUserRawParameters($params);
