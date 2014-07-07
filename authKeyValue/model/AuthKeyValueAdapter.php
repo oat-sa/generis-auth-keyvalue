@@ -34,7 +34,7 @@ use core_kernel_users_AuthAdapter;
  */
 class AuthKeyValueAdapter implements common_user_auth_Adapter
 {
-    CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue:user';
+    CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue';
 
     private $username;
     
