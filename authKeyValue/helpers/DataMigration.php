@@ -1,43 +1,20 @@
 <?php
-/**  
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; under version 2
- * of the License (non-upgradable).
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- * 
+/**
+ * Created by PhpStorm.
+ * User: christophemassin
+ * Date: 3/07/14
+ * Time: 16:39
  */
-namespace oat\authKeyValue\helpers;
 
+namespace oat\authKeyValue\helpers;
 use common_persistence_AdvKeyValuePersistence;
 use oat\authKeyValue\model\AuthKeyValueAdapter;
 use tao_models_classes_UserService;
 
-/**
- * Helper to feed data into the key-value storage
- * 
- * @author Christophe Massin <christope@taotesting.com>
- */
 class DataMigration {
 
-    /**
-     * Migrate users from the ontology to the key-value storage
-     * 
-     * @return number
-     */
     public static function fromOntologyToKey (){
 
-        $migrated = 0;
 
         $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
         $service = tao_models_classes_UserService::singleton();
@@ -47,6 +24,7 @@ class DataMigration {
         foreach( $users as $user){
 
             $userParameterFormatedForDb = array();
+            $userParameterFormatedForDbExtraParameters = array();
             $userParameterFormatedForDb['uri'] = $user->getUri();
 
             $userData = $user->getRdfTriples();
@@ -57,6 +35,7 @@ class DataMigration {
                     case PROPERTY_USER_LOGIN :
                         $userParameterFormatedForDb[PROPERTY_USER_LOGIN] = $property->object;
                         $login = $property->object;
+                        break;
                     case PROPERTY_USER_PASSWORD :
                         $userParameterFormatedForDb[PROPERTY_USER_PASSWORD] = $property->object;
                         $password = $property->object;
@@ -64,20 +43,38 @@ class DataMigration {
                     case PROPERTY_USER_ROLES :
                         $userParameterFormatedForDb[PROPERTY_USER_ROLES][] = $property->object;
                         break;
+                    case PROPERTY_USER_UILG :
+                        $userParameterFormatedForDb[PROPERTY_USER_UILG] = $property->object;
+                        break;
+                    case PROPERTY_USER_DEFLG :
+                        $userParameterFormatedForDb[PROPERTY_USER_DEFLG] = $property->object;
+                        break;
+                    case PROPERTY_USER_FIRSTNAME :
+                        $userParameterFormatedForDb[PROPERTY_USER_FIRSTNAME] = $property->object;
+                        break;
+                    case PROPERTY_USER_LASTNAME :
+                        $userParameterFormatedForDb[PROPERTY_USER_LASTNAME] = $property->object;
+                        break;
                     default :
-                        $userParameterFormatedForDb[$property->predicate] = $property->object;
-
+                        $userParameterFormatedForDbExtraParameters[$property->predicate] = $property->object;
 
                 }
 
             }
 
-            $kvStore->getDriver()->hSet($login, PROPERTY_USER_PASSWORD, $password);
-            $kvStore->getDriver()->hSet($login, 'parameters', json_encode($userParameterFormatedForDb));
-            $migrated++;
+            $kvStore->getDriver()->hSet(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, PROPERTY_USER_PASSWORD, $password);
+            $kvStore->getDriver()->hSet(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, 'parameters', json_encode($userParameterFormatedForDb));
+
+            foreach($userParameterFormatedForDbExtraParameters as $key => $value ) {
+                $kvStore->getDriver()->hSet(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login.':'.$key, $key, $value);
+            }
+
+
+
+            echo $login.'
+';
         }
-        
-        return $migrated;
+
     }
 
     public static function generateKeyValueUser()
@@ -107,10 +104,11 @@ class DataMigration {
                 PROPERTY_USER_LASTNAME => 'Family '.$generationId
             );
 
-            $kvStore->hset($login, PROPERTY_USER_PASSWORD, $password);
-            $kvStore->hset($login, 'parameters', json_encode($tt) );
+            $kvStore->hset(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, PROPERTY_USER_PASSWORD, $password);
+            $kvStore->hset(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, 'parameters', json_encode($tt) );
 
         }
+        echo 'testakers created';
     }
 
 } 

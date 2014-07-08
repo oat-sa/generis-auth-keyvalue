@@ -14,9 +14,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * 
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ *               
  * 
  */
+
+/**
+ * Authentication adapter interface to be implemented by authentication methodes
+ *
+ * @author christophe massin
+ * @package authKeyValue
+ 
+ */
+
 namespace oat\authKeyValue\model;
 
 use common_persistence_AdvKeyValuePersistence;
@@ -34,10 +44,9 @@ use core_kernel_users_AuthAdapter;
  */
 class AuthKeyValueAdapter implements common_user_auth_Adapter
 {
-    CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue:user';
+    CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue';
 
     private $username;
-    
     private $password;
 
     /**
@@ -56,9 +65,9 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
      */
     public function authenticate() {
 
-       $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(self::KEY_VALUE_PERSISTENCE_ID);
+       $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
         // login will always be unique due to redis and his unique keys access system.
-        $userData = $kvStore->getDriver()->hGetAll($this->username);
+        $userData = $kvStore->getDriver()->hGetAll(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$this->username);
 
         $hashing = core_kernel_users_AuthAdapter::getPasswordHash();
 
@@ -68,7 +77,7 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
 
             $params = json_decode($userData['parameters'],true);
             $user = new AuthKeyValueUser();
-            $user->setIdentifier($params->uri);
+            $user->setIdentifier($params['uri']);
             $user->setRoles($params[PROPERTY_USER_ROLES]);
             $user->setLanguage($params[PROPERTY_USER_UILG]);
             $user->setUserRawParameters($params);

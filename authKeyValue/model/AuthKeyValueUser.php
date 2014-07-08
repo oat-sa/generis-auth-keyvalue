@@ -1,34 +1,17 @@
 <?php
-/**  
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; under version 2
- * of the License (non-upgradable).
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- * 
+/**
+ * Created by PhpStorm.
+ * User: christophemassin
+ * Date: 1/07/14
+ * Time: 13:22
  */
-namespace oat\authKeyValue\model;
 
+namespace oat\authKeyValue\model;
 use common_user_User;
 use core_kernel_classes_Resource;
 use core_kernel_classes_Property;
 use common_Logger;
 
-/**
- * User retrieved from key-value storage
- * 
- * @author Christophe Massin <christope@taotesting.com>
- */
 class AuthKeyValueUser extends common_user_User {
 
     protected $userRawParameters;

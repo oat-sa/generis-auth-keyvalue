@@ -16,34 +16,31 @@ require_once dirname(__FILE__) . '/../../generis/test/GenerisPhpUnitTestRunner.p
 class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
 
     public function setUp() {
-
+        $this->user = new AuthKeyValueUser();
     }
 
 
     public function testPropertyValue()
     {
-        $user = new AuthKeyValueUser();
         $languageProperty = 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US';
 
-        $user->setLanguage($languageProperty);
+        $this->user->setLanguage($languageProperty);
 
-        $lang = $user->getLanguage();
+        $lang = $this->user->getLanguage();
 
         $this->assertNotEmpty($lang);
         $this->assertInternalType('array', $lang);
-        $this->assertEquals(array('en-US'), $user->getLanguage());
-        $this->assertEquals(array(0 => 'en-US'), $user->getPropertyValues(PROPERTY_USER_DEFLG));
-        $this->assertEquals(array(0 => 'en-US'), $user->getPropertyValues(PROPERTY_USER_UILG));
+        $this->assertEquals(array('en-US'), $this->user->getLanguage());
+        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(PROPERTY_USER_DEFLG));
+        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(PROPERTY_USER_UILG));
 
+    }
 
-        $user->setRoles(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'));
+    public function testRoles()
+    {
+        $this->user->setRoles(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'));
         $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $user->getRoles());
         $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $user->getPropertyValues(PROPERTY_USER_ROLES));
-
-
-
-
-
     }
 
 
