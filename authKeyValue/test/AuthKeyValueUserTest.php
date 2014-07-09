@@ -15,32 +15,77 @@ require_once dirname(__FILE__) . '/../../generis/test/GenerisPhpUnitTestRunner.p
 
 class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
 
+    /** @var  $user AuthKeyValueUser */
+    protected $user;
+
     public function setUp() {
         $this->user = new AuthKeyValueUser();
+
+        $this->user->setUserRawParameters(
+            array(
+                "uri" => "http://192.168.33.22/transferAll/test.rdf#i140473436657255010",
+                "http://www.w3.org/2000/01/rdf-schema#label" => "Test taker 1",
+                "http://www.tao.lu/Ontologies/generis.rdf#userUILg" => "http://www.tao.lu/Ontologies/TAO.rdf#Langen-US",
+                "http://www.tao.lu/Ontologies/generis.rdf#userDefLg" => "http://www.tao.lu/Ontologies/TAO.rdf#Langen-US",
+                "http://www.tao.lu/Ontologies/generis.rdf#login" => "tt1",
+                "http://www.tao.lu/Ontologies/generis.rdf#password" => "JGXEkjgSvAd978b110dffe22d243a2d18e4afe747d82cb6d1863470afc2016b18ecb3173fb",
+                "http://www.tao.lu/Ontologies/generis.rdf#userRoles" =>
+                    ["http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole"],
+                "http://www.tao.lu/Ontologies/generis.rdf#userFirstName" => "Testtaker 1",
+                "http://www.tao.lu/Ontologies/generis.rdf#userLastName"=>"Family 047"
+            )
+        );
+    }
+
+    public function tearDown(){
+        $this->user = null;
     }
 
 
-    public function testPropertyValue()
+    public function testLanguage()
     {
         $languageProperty = 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US';
 
-        $this->user->setLanguage($languageProperty);
+        $this->user->setLanguageUi($languageProperty);
+        $this->user->setLanguageDefLg($languageProperty);
 
-        $lang = $this->user->getLanguage();
+        $langUi = $this->user->getLanguageUi();
+        $langDefLg = $this->user->getLanguageDefLg();
 
-        $this->assertNotEmpty($lang);
-        $this->assertInternalType('array', $lang);
-        $this->assertEquals(array('en-US'), $this->user->getLanguage());
+        $this->assertNotEmpty($langUi);
+        $this->assertNotEmpty($langDefLg);
+        $this->assertInternalType('array', $langUi);
+        $this->assertInternalType('array', $langDefLg);
+        $this->assertEquals(array('en-US'), $this->user->getLanguageUi());
+        $this->assertEquals(array('en-US'), $this->user->getLanguageDefLg());
+    }
+
+    public function testPropertyValue(){
+
         $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(PROPERTY_USER_DEFLG));
         $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(PROPERTY_USER_UILG));
 
     }
+
 
     public function testRoles()
     {
         $this->user->setRoles(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'));
         $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getRoles());
         $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getPropertyValues(PROPERTY_USER_ROLES));
+    }
+
+    public function testLazyLoadForMail(){
+
+        $array = $this->user->getUserExtraParameters();
+
+        // check array is currently empty
+        $this->assertEmpty($array);
+
+        $mail = $this->user->getPropertyValues(PROPERTY_USER_MAIL);
+
+        $this->assertNotEmpty($this->user->getUserExtraParameters());
+        $this->assertArrayHasKey(PROPERTY_USER_MAIL,$this->user->getUserExtraParameters());
     }
 
 

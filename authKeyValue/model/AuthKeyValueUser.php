@@ -129,7 +129,7 @@ class AuthKeyValueUser extends common_user_User {
 
         $userParameters = $this->getUserRawParameters();
 
-        if(array_key_exists($property, $userParameters))
+        if( !empty($userParameters) && array_key_exists($property, $userParameters))
         {
             switch ($property) {
                 case PROPERTY_USER_DEFLG :
@@ -156,9 +156,11 @@ class AuthKeyValueUser extends common_user_User {
                 $serviceUser = new AuthKeyValueUserService();
                 $key = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$userParameters[PROPERTY_USER_LOGIN].':'.$property ;
                 $parameter = $serviceUser->getUserParameter($key, $property);
-                $extraParameters[$property] = $parameter;
 
-                $this->setUserExtraParameters($extraParameters);
+                if( strlen(base64_encode(serialize($parameter))) < 10000 ) {
+                    $extraParameters[$property] = $parameter;
+                    $this->setUserExtraParameters($extraParameters);
+                }
 
                 $returnValue = array($parameter);
             }
