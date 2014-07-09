@@ -88,6 +88,19 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
         $this->assertArrayHasKey(PROPERTY_USER_MAIL,$this->user->getUserExtraParameters());
     }
 
+    public function testLazyLoadForMultiParams(){
+
+        $array = $this->user->getUserExtraParameters();
+
+
+        // check array is currently empty
+        $this->assertEmpty($array);
+        $this->user->setUserExtraParameters(array('property' => array('property1', 'property2', 'property3')));
+
+        $this->assertNotEmpty($this->user->getUserExtraParameters());
+        $this->assertArrayHasKey('property',$this->user->getUserExtraParameters());
+        $this->assertEquals( array('property1', 'property2', 'property3') ,$this->user->getPropertyValues('property'));
+    }
 
 }
  

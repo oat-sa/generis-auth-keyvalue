@@ -35,6 +35,7 @@ use helpers_PasswordHash;
 use core_kernel_users_InvalidLoginException;
 use common_session_BasicSession;
 use core_kernel_users_AuthAdapter;
+use oat\authKeyValue\model\AuthKeyValueUserService;
 
 /**
  * Adapter to authenticate users stored in the key value implementation
@@ -65,9 +66,8 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
      */
     public function authenticate() {
 
-       $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
-        // login will always be unique due to redis and his unique keys access system.
-        $userData = $kvStore->getDriver()->hGetAll(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$this->username);
+        $service = new AuthKeyValueUserService();
+        $userData = $service->getUserData($this->username);
 
         $hashing = core_kernel_users_AuthAdapter::getPasswordHash();
 
@@ -75,7 +75,7 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
         {
             // user is authentified, create the user for the session
 
-            $params = json_decode($userData['parameters'],true);
+            $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
             $user = new AuthKeyValueUser();
             $user->setIdentifier($params['uri']);
             $user->setRoles($params[PROPERTY_USER_ROLES]);
@@ -91,4 +91,6 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
         }
 
     }
+
+
 }

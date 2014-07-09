@@ -13,6 +13,13 @@ use common_persistence_AdvKeyValuePersistence;
 class AuthKeyValueUserService {
 
 
+    const PREFIXES_KEY = 'auth';
+
+    const USER_PARAMETERS = 'parameters';
+
+    /**
+     * @var \common_persistence_Driver
+     */
     protected $driver;
 
 
@@ -21,37 +28,50 @@ class AuthKeyValueUserService {
         $this->driver = $kvStore->getDriver();
     }
 
-    public function getUserParameter($userLogin, $userParameter){
-        return $this->driver->hGet($userLogin, $userParameter);
+
+    /**
+     * @param $login
+     * @return mixed
+     */
+    public function getUserData($login){
+        return $this->driver->hGetAll(AuthKeyValueUserService::PREFIXES_KEY.':'.$login);
     }
 
 
-    public function addUser($userLogin,array $arrayParameter){
+    /**
+     * @param $userLogin string
+     * @param $parameter string
+     * @return mixed
+     */
+    public function getUserParameter($userLogin, $parameter){
+        return $this->driver->get(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter);
+    }
 
+    /**
+     * @param $userLogin string user login
+     * @param $parameter string parameter
+     * @param $value mixed
+     */
+    public function addUserParameter($userLogin, $parameter, $value){
+        $this->driver->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter, $value);
     }
 
 
-    public function addUserParameter($userLogin, $userParameter, $value){
-        $this->driver->hSet($userLogin, $userParameter, $value);
+    /**
+     * @param $userLogin string
+     * @param $parameter string
+     */
+    public function deleteUserParameter($userLogin, $parameter){
+        $this->driver->del(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter);
     }
 
 
-    public function deleteUser($userLogin){
-        $this->driver->del($userLogin);
-    }
-
-
-    public function deleteUserParameter($userLogin, $userParameter){
-        $this->driver->hDel($userLogin, $userParameter);
-    }
-
-
-    public function editUser($userLogin, array $arrayParameter){
-
-    }
-
-
-    public function editUserParameter($userLogin, $userParameter, $value){
-        $this->driver->hSet($userLogin,$userParameter,$value);
+    /**
+     * @param $userLogin
+     * @param $parameter
+     * @param $value
+     */
+    public function editUserParameter($userLogin, $parameter, $value){
+        $this->driver->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter, $value);
     }
 } 

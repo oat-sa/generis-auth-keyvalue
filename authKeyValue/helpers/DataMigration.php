@@ -10,6 +10,7 @@ namespace oat\authKeyValue\helpers;
 use common_persistence_AdvKeyValuePersistence;
 use oat\authKeyValue\model\AuthKeyValueAdapter;
 use tao_models_classes_UserService;
+use oat\authKeyValue\model\AuthKeyValueUserService;
 
 class DataMigration {
 
@@ -62,14 +63,14 @@ class DataMigration {
             }
 
 
-            $kvStore->getDriver()->hSet(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, PROPERTY_USER_PASSWORD, $password);
-            $kvStore->getDriver()->hSet(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, 'parameters', json_encode($userParameterFormatedForDb));
+            $kvStore->getDriver()->hSet(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, PROPERTY_USER_PASSWORD, $password);
+            $kvStore->getDriver()->hSet(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, 'parameters', json_encode($userParameterFormatedForDb));
 
             foreach($userParameterFormatedForDbExtraParameters as $key => $value ) {
-                $kvStore->getDriver()->hSet(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login.':'.$key, $key, $value);
+                $kvStore->getDriver()->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$login.':'.$key, $value);
             }
-
-
+var_dump($userParameterFormatedForDbExtraParameters);
+break;
             echo $login.'
 ';
 
@@ -77,9 +78,12 @@ class DataMigration {
 
     }
 
+    /**
+     * Function that will generate key value user in redis database
+     */
     public static function generateKeyValueUser()
     {
-        $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
+        $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueUserService::PREFIXES_KEY);
 
         $generationId = substr( md5(rand()), 0, 3);
 
@@ -104,8 +108,8 @@ class DataMigration {
                 PROPERTY_USER_LASTNAME => 'Family '.$generationId
             );
 
-            $kvStore->hset(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, PROPERTY_USER_PASSWORD, $password);
-            $kvStore->hset(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, 'parameters', json_encode($tt) );
+            $kvStore->hset(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, PROPERTY_USER_PASSWORD, $password);
+            $kvStore->hset(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, 'parameters', json_encode($tt) );
 
         }
         echo 'testakers created';

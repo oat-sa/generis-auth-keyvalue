@@ -14,6 +14,9 @@ use common_Logger;
 
 class AuthKeyValueUser extends common_user_User {
 
+    static $config = array('max_size_cached_element' => 10000 );
+
+
     /**
      * @var array
      */
@@ -66,7 +69,7 @@ class AuthKeyValueUser extends common_user_User {
     /**
      * Returns the language code
      * 
-     * @return string
+     * @return array
      */
     public function getLanguageDefLg()
     {
@@ -135,10 +138,17 @@ class AuthKeyValueUser extends common_user_User {
     }
 
 
+    /**
+     * @return string
+     */
     public function getIdentifier(){
         return $this->identifier;
     }
 
+    /**
+     * @param $identifier
+     * @return $this
+     */
     public function setIdentifier($identifier){
         $this->identifier = $identifier;
 
@@ -146,6 +156,10 @@ class AuthKeyValueUser extends common_user_User {
     }
 
 
+    /**
+     * @param $property string
+     * @return array|null
+     */
     public function getPropertyValues($property)
     {
         $returnValue = null;
@@ -171,14 +185,18 @@ class AuthKeyValueUser extends common_user_User {
             $extraParameters = $this->getUserExtraParameters();
             // the element has already been accessed
             if(!empty($extraParameters) && array_key_exists($property, $extraParameters)){
-                $returnValue = array($extraParameters[$property]);
+                if(!is_array($extraParameters[$property])){
+                    $returnValue = array($extraParameters[$property]);
+                } else {
+                    $returnValue = $extraParameters[$property];
+                }
+
             } else {
                 // not already accessed, we are going to get it.
                 $serviceUser = new AuthKeyValueUserService();
-                $key = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$userParameters[PROPERTY_USER_LOGIN].':'.$property ;
-                $parameter = $serviceUser->getUserParameter($key, $property);
+                $parameter = $serviceUser->getUserParameter($userParameters[PROPERTY_USER_LOGIN], $property);
 
-                if( strlen(base64_encode(serialize($parameter))) < 10000 ) {
+                if( strlen(base64_encode(serialize($parameter))) < self::$config['max_size_cached_element'] ) {
                     $extraParameters[$property] = $parameter;
                     $this->setUserExtraParameters($extraParameters);
                 }
@@ -192,19 +210,35 @@ class AuthKeyValueUser extends common_user_User {
     }
 
 
+    /**
+     * Function that will refresh the parameters.
+     */
     public function refresh() {
+        $this->setUserExtraParameters(null);
 
+        $service = new AuthKeyValueUserService();
+        $userData = $service->getUserData($this->getPropertyValues(PROPERTY_USER_LOGIN));
+
+        $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
+        $this->setUserRawParameters($params);
     }
 
 
+    /**
+     * @return array
+     */
     public function getRoles() {
         return $this->roles;
     }
 
+    /**
+     * @param array $roles
+     * @return $this
+     */
     public function setRoles(array $roles ) {
         $this->roles = $roles;
 
         return $this;
     }
 
-} 
+}
