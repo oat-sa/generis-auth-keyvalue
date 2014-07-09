@@ -14,26 +14,46 @@ use common_Logger;
 
 class AuthKeyValueUser extends common_user_User {
 
+    /**
+     * @var array
+     */
     protected $userRawParameters;
 
+    /**
+     * @var array
+     */
     protected $userExtraParameters = array();
 
+    /**
+     * @var string
+     */
     protected $identifier;
 
     /** @var  array $roles */
     protected $roles;
 
-
+    /**
+     * Array that contains the language code as a single string  
+     * 
+     * @var array
+     */
     protected $languageUi = array(DEFAULT_LANG);
 
+    /**
+     * Array that contains the language code as a single string
+     * 
+     * @var array
+     */
     protected $languageDefLg = array(DEFAULT_LANG);
 
     /**
-     * @param array $languageDefLg
+     * Sets the language URI
+     * 
+     * @param string $languageDefLgUri
      */
-    public function setLanguageDefLg($languageDefLg)
+    public function setLanguageDefLg($languageDefLgUri)
     {
-        $languageResource = new core_kernel_classes_Resource($languageDefLg);
+        $languageResource = new core_kernel_classes_Resource($languageDefLgUri);
 
         $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(RDF_VALUE));
         if($languageCode) {
@@ -44,7 +64,9 @@ class AuthKeyValueUser extends common_user_User {
     }
 
     /**
-     * @return array
+     * Returns the language code
+     * 
+     * @return string
      */
     public function getLanguageDefLg()
     {
@@ -52,15 +74,15 @@ class AuthKeyValueUser extends common_user_User {
     }
 
     /**
-     * @param mixed $userExtraParameters
+     * @param array $userExtraParameters
      */
-    public function setUserExtraParameters($userExtraParameters)
+    public function setUserExtraParameters(array $userExtraParameters)
     {
         $this->userExtraParameters = $userExtraParameters;
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getUserExtraParameters()
     {
@@ -70,9 +92,10 @@ class AuthKeyValueUser extends common_user_User {
 
 
     /**
-     * @param mixed $userRawParameters
+     * @param rray $userRawParameters
+     * @return AuthKeyValueUser
      */
-    public function setUserRawParameters($userRawParameters)
+    public function setUserRawParameters(array $userRawParameters)
     {
         $this->userRawParameters = $userRawParameters;
 
@@ -80,7 +103,7 @@ class AuthKeyValueUser extends common_user_User {
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getUserRawParameters()
     {
@@ -104,7 +127,7 @@ class AuthKeyValueUser extends common_user_User {
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getLanguageUi()
     {
@@ -144,15 +167,13 @@ class AuthKeyValueUser extends common_user_User {
                 default:
                     $returnValue = array($userParameters[$property]);
             }
-        }
-        else {
+        } else {
             $extraParameters = $this->getUserExtraParameters();
             // the element has already been accessed
             if(!empty($extraParameters) && array_key_exists($property, $extraParameters)){
                 $returnValue = array($extraParameters[$property]);
-            }
-            // not already accessed, we are going to get it.
-            else {
+            } else {
+                // not already accessed, we are going to get it.
                 $serviceUser = new AuthKeyValueUserService();
                 $key = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$userParameters[PROPERTY_USER_LOGIN].':'.$property ;
                 $parameter = $serviceUser->getUserParameter($key, $property);
