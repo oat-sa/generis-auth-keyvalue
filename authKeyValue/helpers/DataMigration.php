@@ -20,7 +20,6 @@ class DataMigration {
         $service = tao_models_classes_UserService::singleton();
         $users = $service->getAllUsers();
 
-
         foreach( $users as $user){
 
             $userParameterFormatedForDb = array();
@@ -62,6 +61,7 @@ class DataMigration {
 
             }
 
+
             $kvStore->getDriver()->hSet(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, PROPERTY_USER_PASSWORD, $password);
             $kvStore->getDriver()->hSet(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$login, 'parameters', json_encode($userParameterFormatedForDb));
 
@@ -70,9 +70,9 @@ class DataMigration {
             }
 
 
-
             echo $login.'
 ';
+
         }
 
     }

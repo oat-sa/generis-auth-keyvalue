@@ -7,6 +7,7 @@
  */
 
 namespace oat\authKeyValue\model;
+use common_persistence_AdvKeyValuePersistence;
 
 
 class AuthKeyValueUserService {
@@ -18,6 +19,10 @@ class AuthKeyValueUserService {
     public function __construct(){
         $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
         $this->driver = $kvStore->getDriver();
+    }
+
+    public function getUserParameter($userLogin, $userParameter){
+        return $this->driver->hGet($userLogin, $userParameter);
     }
 
 

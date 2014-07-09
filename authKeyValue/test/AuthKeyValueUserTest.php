@@ -39,8 +39,8 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
     public function testRoles()
     {
         $this->user->setRoles(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'));
-        $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $user->getRoles());
-        $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $user->getPropertyValues(PROPERTY_USER_ROLES));
+        $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getRoles());
+        $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getPropertyValues(PROPERTY_USER_ROLES));
     }
 
 

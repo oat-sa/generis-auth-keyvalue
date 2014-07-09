@@ -79,9 +79,9 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
             $user = new AuthKeyValueUser();
             $user->setIdentifier($params['uri']);
             $user->setRoles($params[PROPERTY_USER_ROLES]);
-            $user->setLanguage($params[PROPERTY_USER_UILG]);
+            $user->setLanguageUi($params[PROPERTY_USER_UILG]);
+            $user->setLanguageDefLg($params[PROPERTY_USER_DEFLG]);
             $user->setUserRawParameters($params);
-
 
             $session = new \common_session_DefaultSession($user);
             \common_session_SessionManager::startSession($session);
