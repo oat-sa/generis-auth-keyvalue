@@ -67,7 +67,8 @@ class AuthKeyValue extends \tao_actions_CommonModule {
 
         if($myForm->isSubmited()){
             if($myForm->isValid()){
-                $adapter = new AuthKeyValueAdapter($myForm->getValue('login'), $myForm->getValue('password'));
+                $adapter = new AuthKeyValueAdapter(array());
+                $adapter->setCredentials($myForm->getValue('login'), $myForm->getValue('password'));
                 $adapter->authenticate();
 
                 if ($this->hasRequestParameter('redirect')) {
