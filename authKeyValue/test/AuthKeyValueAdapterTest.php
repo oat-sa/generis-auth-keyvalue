@@ -13,6 +13,7 @@ use oat\authKeyValue\model\AuthKeyValueUser;
 use GenerisPhpUnitTestRunner;
 use common_session_SessionManager;
 use common_persistence_AdvKeyValuePersistence;
+use core_kernel_users_Service;
 
 require_once dirname(__FILE__) . '/../../generis/test/GenerisPhpUnitTestRunner.php';
 
@@ -41,7 +42,7 @@ class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
                     "http://www.tao.lu/Ontologies/generis.rdf#userUILg" => "http://www.tao.lu/Ontologies/TAO.rdf#Langen-US",
                     "http://www.tao.lu/Ontologies/generis.rdf#userDefLg" => "http://www.tao.lu/Ontologies/TAO.rdf#Langen-US",
                     "http://www.tao.lu/Ontologies/generis.rdf#login" => "tt1",
-                    "http://www.tao.lu/Ontologies/generis.rdf#password" => "JGXEkjgSvAd978b110dffe22d243a2d18e4afe747d82cb6d1863470afc2016b18ecb3173fb",
+                    "http://www.tao.lu/Ontologies/generis.rdf#password" => core_kernel_users_Service::getPasswordHash()->encrypt($this->password),
                     "http://www.tao.lu/Ontologies/generis.rdf#userRoles" =>
                         ["http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole"],
                     "http://www.tao.lu/Ontologies/generis.rdf#userFirstName" => "Testtaker 1",
@@ -61,10 +62,8 @@ class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
      */
     public function testAuthenticate()
     {
-        $this->adapter->authenticate();
-        $session = \common_session_SessionManager::getSession();
-
-        $this->assertEquals( $session->getUserPropertyValues(PROPERTY_USER_LOGIN), array($this->login));
+        $user = $this->adapter->authenticate();
+        $this->assertEquals( $user->getPropertyValues(PROPERTY_USER_LOGIN), array($this->login));
     }
 
 

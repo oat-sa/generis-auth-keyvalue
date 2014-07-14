@@ -116,10 +116,9 @@ class AuthKeyValueAdapter implements LoginAdapter
             $user->setLanguageUi($params[PROPERTY_USER_UILG]);
             $user->setLanguageDefLg($params[PROPERTY_USER_DEFLG]);
             $user->setUserRawParameters($params);
-
-            $session = new \common_session_DefaultSession($user);
-            \common_session_SessionManager::startSession($session);
-
+            
+            return $user;
+            
         } else {
             throw new core_kernel_users_InvalidLoginException();
         }
