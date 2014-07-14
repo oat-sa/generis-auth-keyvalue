@@ -35,6 +35,8 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
                 "http://www.tao.lu/Ontologies/generis.rdf#userLastName"=>"Family 047"
             )
         );
+
+        $this->user->setConfiguration( array('max_size_cached_element' => 10000 ) );
     }
 
     public function tearDown(){
@@ -42,6 +44,25 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
     }
 
 
+    /**
+     * @cover AuthKeyValueUser::getConfiguration
+     */
+    public function testGetConfigurationKey()
+    {
+        $config = $this->user->getConfiguration();
+
+        $this->assertInternalType('array', $config);
+        $this->assertArrayHasKey('max_size_cached_element', $config);
+        $this->assertEquals(10000, $config['max_size_cached_element']);
+    }
+
+
+    /**
+     * @cover AuthKeyValueUser::setLanguageUi
+     * @cover AuthKeyValueUser::getLanguageUi
+     * @cover AuthKeyValueUser::setLanguageDefLg
+     * @cover AuthKeyValueUser::getLanguageDefLg
+     */
     public function testLanguage()
     {
         $languageProperty = 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US';
@@ -60,6 +81,10 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
         $this->assertEquals(array('en-US'), $this->user->getLanguageDefLg());
     }
 
+
+    /**
+     * @cover AuthKeyValueUser::getPropertyValues
+     */
     public function testPropertyValue(){
 
         $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(PROPERTY_USER_DEFLG));
@@ -68,6 +93,10 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
     }
 
 
+    /**
+     * @cover AuthKeyValueUser::setRoles
+     * @cover AuthKeyValueUser::getRoles
+     */
     public function testRoles()
     {
         $this->user->setRoles(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'));
@@ -75,6 +104,10 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
         $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getPropertyValues(PROPERTY_USER_ROLES));
     }
 
+
+    /**
+     * @cover AuthKeyValueUser::getPropertyValues
+     */
     public function testLazyLoadForMail(){
 
         $array = $this->user->getUserExtraParameters();
@@ -88,6 +121,23 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
         $this->assertArrayHasKey(PROPERTY_USER_MAIL,$this->user->getUserExtraParameters());
     }
 
+
+    /**
+     * @cover AuthKeyValueUser::getPropertyValues
+     */
+    public function testLazyLoadForMultiParams(){
+
+        $array = $this->user->getUserExtraParameters();
+
+
+        // check array is currently empty
+        $this->assertEmpty($array);
+        $this->user->setUserExtraParameters(array('property' => array('property1', 'property2', 'property3')));
+
+        $this->assertNotEmpty($this->user->getUserExtraParameters());
+        $this->assertArrayHasKey('property',$this->user->getUserExtraParameters());
+        $this->assertEquals( array('property1', 'property2', 'property3') ,$this->user->getPropertyValues('property'));
+    }
 
 }
  

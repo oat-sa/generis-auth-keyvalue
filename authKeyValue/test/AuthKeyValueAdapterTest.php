@@ -50,17 +50,47 @@ class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
             );
         }
 
-        $this->adapter = new AuthKeyValueAdapter($this->login,$this->password);
+        $config = array('max_size_cached_element' => 10000);
+        $this->adapter = new AuthKeyValueAdapter($config);
+        $this->adapter->setCredentials($this->login,$this->password);
     }
 
 
+    /**
+     * @cover AuthKeyValueAdapter::authenticate
+     */
     public function testAuthenticate()
     {
-
         $this->adapter->authenticate();
         $session = \common_session_SessionManager::getSession();
 
         $this->assertEquals( $session->getUserPropertyValues(PROPERTY_USER_LOGIN), array($this->login));
+    }
+
+
+    /**
+     * @cover AuthKeyValueAdapter::getConfiguration
+     */
+    public function testGetConfiguration()
+    {
+        $config = $this->adapter->getConfiguration();
+
+        $this->assertInternalType('array', $config);
+        $this->assertArrayHasKey('max_size_cached_element', $config);
+        $this->assertEquals(10000, $config['max_size_cached_element']);
+    }
+
+    /**
+     * @cover AuthKeyValueAdapter::setConfiguration
+     */
+    public function testSetConfiguration()
+    {
+        $this->adapter->setConfiguration( array('pika' => 'tchu'));
+        $config = $this->adapter->getConfiguration();
+
+        $this->assertInternalType('array', $config);
+        $this->assertArrayHasKey('pika', $config);
+        $this->assertEquals('tchu', $config['pika']);
     }
 
 

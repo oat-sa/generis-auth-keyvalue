@@ -1,18 +1,45 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: christophemassin
- * Date: 1/07/14
- * Time: 13:22
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2014 (original work) Open Assessment Technologies SA;
+ *
+ *
  */
+
+/**
+ * Authentication user for key value db access
+ *
+ * @author christophe massin
+ * @package authKeyValue
+
+ */
+
 
 namespace oat\authKeyValue\model;
 use common_user_User;
 use core_kernel_classes_Resource;
 use core_kernel_classes_Property;
 use common_Logger;
+use SebastianBergmann\Exporter\Exception;
 
 class AuthKeyValueUser extends common_user_User {
+
+
+    /** @var  array of configuration */
+    protected $configuration;
 
     /**
      * @var array
@@ -47,6 +74,23 @@ class AuthKeyValueUser extends common_user_User {
     protected $languageDefLg = array(DEFAULT_LANG);
 
     /**
+     * @param array $configuration
+     */
+    public function setConfiguration($configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
+
+
+    /**
      * Sets the language URI
      * 
      * @param string $languageDefLgUri
@@ -66,7 +110,7 @@ class AuthKeyValueUser extends common_user_User {
     /**
      * Returns the language code
      * 
-     * @return string
+     * @return array
      */
     public function getLanguageDefLg()
     {
@@ -135,10 +179,17 @@ class AuthKeyValueUser extends common_user_User {
     }
 
 
+    /**
+     * @return string
+     */
     public function getIdentifier(){
         return $this->identifier;
     }
 
+    /**
+     * @param $identifier
+     * @return $this
+     */
     public function setIdentifier($identifier){
         $this->identifier = $identifier;
 
@@ -146,6 +197,10 @@ class AuthKeyValueUser extends common_user_User {
     }
 
 
+    /**
+     * @param $property string
+     * @return array|null
+     */
     public function getPropertyValues($property)
     {
         $returnValue = null;
@@ -171,17 +226,27 @@ class AuthKeyValueUser extends common_user_User {
             $extraParameters = $this->getUserExtraParameters();
             // the element has already been accessed
             if(!empty($extraParameters) && array_key_exists($property, $extraParameters)){
-                $returnValue = array($extraParameters[$property]);
+                if(!is_array($extraParameters[$property])){
+                    $returnValue = array($extraParameters[$property]);
+                } else {
+                    $returnValue = $extraParameters[$property];
+                }
+
             } else {
                 // not already accessed, we are going to get it.
                 $serviceUser = new AuthKeyValueUserService();
-                $key = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$userParameters[PROPERTY_USER_LOGIN].':'.$property ;
-                $parameter = $serviceUser->getUserParameter($key, $property);
+                $parameter = $serviceUser->getUserParameter($userParameters[PROPERTY_USER_LOGIN], $property);
 
-                if( strlen(base64_encode(serialize($parameter))) < 10000 ) {
-                    $extraParameters[$property] = $parameter;
-                    $this->setUserExtraParameters($extraParameters);
+                $config = $this->getConfiguration();
+                if(isset($config['max_size_cached_element'])){
+                    if( strlen(base64_encode(serialize($parameter))) < $config['max_size_cached_element'] ) {
+                        $extraParameters[$property] = $parameter;
+                        $this->setUserExtraParameters($extraParameters);
+                    }
+                } else {
+                    throw new Exception('Missing configuration element max_sized_cached_element');
                 }
+
 
                 $returnValue = array($parameter);
             }
@@ -192,19 +257,35 @@ class AuthKeyValueUser extends common_user_User {
     }
 
 
+    /**
+     * Function that will refresh the parameters.
+     */
     public function refresh() {
+        $this->setUserExtraParameters(null);
 
+        $service = new AuthKeyValueUserService();
+        $userData = $service->getUserData($this->getPropertyValues(PROPERTY_USER_LOGIN));
+
+        $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
+        $this->setUserRawParameters($params);
     }
 
 
+    /**
+     * @return array
+     */
     public function getRoles() {
         return $this->roles;
     }
 
+    /**
+     * @param array $roles
+     * @return $this
+     */
     public function setRoles(array $roles ) {
         $this->roles = $roles;
 
         return $this;
     }
 
-} 
+}

@@ -29,12 +29,12 @@
 
 namespace oat\authKeyValue\model;
 
-use common_persistence_AdvKeyValuePersistence;
 use common_user_auth_Adapter;
-use helpers_PasswordHash;
 use core_kernel_users_InvalidLoginException;
-use common_session_BasicSession;
 use core_kernel_users_AuthAdapter;
+use oat\authKeyValue\model\AuthKeyValueUserService;
+use oat\oatbox\user\auth\LoginAdapter;
+
 
 /**
  * Adapter to authenticate users stored in the key value implementation
@@ -42,21 +42,55 @@ use core_kernel_users_AuthAdapter;
  * @author Christophe Massin <christope@taotesting.com>
  *
  */
-class AuthKeyValueAdapter implements common_user_auth_Adapter
+class AuthKeyValueAdapter implements LoginAdapter
 {
+
+    /** Key used to retrieve the persistence information */
     CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue';
 
+    /** @var  $username string */
     private $username;
+
+    /** @var  $password string */
     private $password;
 
+    /** @var $configuration array $configuration  */
+    protected $configuration;
+
+
     /**
+     * @param array $configuration
+     */
+    public function __construct(array $configuration) {
+        $this->configuration = $configuration;
+
+    /**
+     * Set the credential
      *
-     * @param string $username
+     * @param string $login
      * @param string $password
      */
-    public function __construct($username, $password) {
-        $this->username = $username;
+    }
+
+    public function setCredentials($login, $password){
+        $this->username = $login;
         $this->password = $password;
+    }
+
+    /**
+     * @param array $configuration
+     */
+    public function setConfiguration(array $configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
     }
 
 	/**
@@ -65,9 +99,8 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
      */
     public function authenticate() {
 
-       $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
-        // login will always be unique due to redis and his unique keys access system.
-        $userData = $kvStore->getDriver()->hGetAll(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$this->username);
+        $service = new AuthKeyValueUserService();
+        $userData = $service->getUserData($this->username);
 
         $hashing = core_kernel_users_Service::getPasswordHash();
 
@@ -75,8 +108,9 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
         {
             // user is authentified, create the user for the session
 
-            $params = json_decode($userData['parameters'],true);
+            $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
             $user = new AuthKeyValueUser();
+            $user->setConfiguration($this->getConfiguration());
             $user->setIdentifier($params['uri']);
             $user->setRoles($params[PROPERTY_USER_ROLES]);
             $user->setLanguageUi($params[PROPERTY_USER_UILG]);
@@ -91,4 +125,7 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
         }
 
     }
+
+
 }
+
