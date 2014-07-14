@@ -69,7 +69,7 @@ class AuthKeyValueAdapter implements common_user_auth_Adapter
         // login will always be unique due to redis and his unique keys access system.
         $userData = $kvStore->getDriver()->hGetAll(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID.':'.$this->username);
 
-        $hashing = core_kernel_users_AuthAdapter::getPasswordHash();
+        $hashing = core_kernel_users_Service::getPasswordHash();
 
         if( isset($userData[PROPERTY_USER_PASSWORD]) && $hashing->verify($this->password, $userData[PROPERTY_USER_PASSWORD]))
         {

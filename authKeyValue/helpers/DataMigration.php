@@ -88,7 +88,7 @@ class DataMigration {
 
         for ($i = 0; $i < 1000; $i++) {
             $login = 'tt'.$i;
-            $password = \core_kernel_users_AuthAdapter::getPasswordHash()->encrypt('pass'.$i);
+            $password = \core_kernel_users_Service::getPasswordHash()->encrypt('pass'.$i);
 
             $uri = \common_Utils::getNewUri();
 
