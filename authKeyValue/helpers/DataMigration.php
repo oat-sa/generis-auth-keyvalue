@@ -71,10 +71,6 @@ class DataMigration {
             foreach($userParameterFormatedForDbExtraParameters as $key => $value ) {
                 $kvStore->getDriver()->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$login.':'.$key, $value);
             }
-var_dump($userParameterFormatedForDbExtraParameters);
-break;
-            echo $login.'
-';
 
         }
 
@@ -114,7 +110,6 @@ break;
             $kvStore->hset(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, 'parameters', json_encode($tt) );
 
         }
-        echo 'testakers created';
     }
 
 } 

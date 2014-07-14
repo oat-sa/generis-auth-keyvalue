@@ -23,4 +23,5 @@
 <?php
 require_once dirname(__FILE__) .'/../includes/raw_start.php';
 oat\authKeyValue\helpers\DataMigration::generateKeyValueUser();
+echo 'Test taker created';
 ?>
