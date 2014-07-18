@@ -1,5 +1,5 @@
 {
-    "name" : "oat-sa/generis-auth-keyvalue",
+    "name" : "oat-sa/keyvalue-authentication",
     "description" : "Generis key value authentication",
     "type" : "library",
     "version" : "0.1",
