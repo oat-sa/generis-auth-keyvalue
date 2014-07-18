@@ -1,6 +1,28 @@
 {
+    "name" : "oat-sa/generis-auth-keyvalue",
+    "description" : "Generis key value authentication",
+    "type" : "library",
+    "version" : "0.1",
+    "support": {
+        "forum": "http://forum.taotesting.com",
+        "issues": "http://forge.taotesting.com"
+    },
+    "keywords" : [
+        "tao",
+        "oat",
+        "computer-based-assessment"
+    ],
+    "autoload" : {
+        "psr-4" : {
+            "oat\\authKeyValue\\" : ""
+        }
+    },
+    "homepage" : "http://www.taotesting.com",
+    "license" : [
+        "GPL-2.0"
+    ],
+    "minimum-stability" : "dev",
     "require-dev": {
-        "zendframework/zend-ldap" : "2.*",
         "phpunit/phpunit": "4.1.*",
         "phpunit/php-code-coverage": "2.*"
     }
