@@ -14,13 +14,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * 
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA;
- *               
+ * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  * 
  */
-               
-require_once dirname(__FILE__). '/../tao/includes/class.Bootstrap.php';
+
+/**
+ * RAW Bootstraping
+ *
+ * @author CRP Henri Tudor - TAO Team - {@link http://www.tao.lu}
+ * @license GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
+ */
+require_once dirname(__FILE__) . '/../../../../../tao/includes/class.Bootstrap.php';
 
 $bootStrap = new BootStrap('authKeyValue');
 $bootStrap->start();
-$bootStrap->dispatch();
