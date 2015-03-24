@@ -37,7 +37,13 @@ use Exception;
 
 class AuthKeyValueUser extends common_user_User {
 
-
+    /**
+     * Max size of a property to store in the session in characters
+     * 
+     * @var int
+     */
+    const DEFAULT_MAX_CACHE_SIZE = 1000;
+    
     /** @var  array of configuration */
     protected $configuration;
 
@@ -216,7 +222,6 @@ class AuthKeyValueUser extends common_user_User {
                     $returnValue = $userParameters[$property];
             }
         } else {
-            /*
             $extraParameters = $this->getUserExtraParameters();
             // the element has already been accessed
             if(!empty($extraParameters) && array_key_exists($property, $extraParameters)){
@@ -229,22 +234,17 @@ class AuthKeyValueUser extends common_user_User {
             } else {
                 // not already accessed, we are going to get it.
                 $serviceUser = new AuthKeyValueUserService();
-                $parameter = $serviceUser->getUserParameter($userParameters[PROPERTY_USER_LOGIN], $property);
+                $login = reset($userParameters[PROPERTY_USER_LOGIN]);
+                $value = $serviceUser->getUserParameter($login, $property);
 
                 $config = $this->getConfiguration();
-                if(isset($config['max_size_cached_element'])){
-                    if( strlen(base64_encode(serialize($parameter))) < $config['max_size_cached_element'] ) {
-                        $extraParameters[$property] = $parameter;
-                        $this->setUserExtraParameters($extraParameters);
-                    }
-                } else {
-                    throw new Exception('Missing configuration element max_sized_cached_element');
+                if( strlen(base64_encode(serialize($value))) < $this->getMaxCacheSize() ) {
+                    $extraParameters[$property] = $value;
+                    $this->setUserExtraParameters($extraParameters);
                 }
 
-
-                $returnValue = array($parameter);
+                $returnValue = array($value);
             }
-            */
 
         }
 
@@ -263,6 +263,11 @@ class AuthKeyValueUser extends common_user_User {
 
         $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
         $this->setUserRawParameters($params);
+    }
+    
+    protected function getMaxCacheSize() {
+        $config = $this->getConfiguration();
+        return isset($config['max_size_cached_element']) ? $config['max_size_cached_element'] : self::DEFAULT_MAX_CACHE_SIZE; 
     }
 
 }
