@@ -27,7 +27,7 @@
 
  */
 
-namespace oat\authKeyValue\model;
+namespace oat\authKeyValue;
 use common_persistence_AdvKeyValuePersistence;
 
 

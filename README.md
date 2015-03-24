@@ -31,7 +31,7 @@ Once it's done, run a composer update.
 To enable them, you need to go to config/generis/auth.conf.php and add these lines 
 
     array(
-        'driver' => 'oat\authKeyValue\model\AuthKeyValueAdapter',
+        'driver' => 'oat\authKeyValue\AuthKeyValueAdapter',
     ),
 
 Then the login will try to use this library. 

@@ -27,12 +27,11 @@
  
  */
 
-namespace oat\authKeyValue\model;
+namespace oat\authKeyValue;
 
 use core_kernel_users_Service;
 use core_kernel_users_InvalidLoginException;
 use core_kernel_users_AuthAdapter;
-use oat\authKeyValue\model\AuthKeyValueUserService;
 use oat\oatbox\user\auth\LoginAdapter;
 use oat\oatbox\Configurable;
 

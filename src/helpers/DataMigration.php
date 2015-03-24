@@ -9,9 +9,9 @@
 namespace oat\authKeyValue\helpers;
 
 use common_persistence_AdvKeyValuePersistence;
-use oat\authKeyValue\model\AuthKeyValueAdapter;
+use oat\authKeyValue\AuthKeyValueAdapter;
 use tao_models_classes_UserService;
-use oat\authKeyValue\model\AuthKeyValueUserService;
+use oat\authKeyValue\AuthKeyValueUserService;
 use core_kernel_users_Service;
 
 class DataMigration {

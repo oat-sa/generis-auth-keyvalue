@@ -28,7 +28,7 @@
  */
 
 
-namespace oat\authKeyValue\model;
+namespace oat\authKeyValue;
 use common_user_User;
 use core_kernel_classes_Resource;
 use core_kernel_classes_Property;
