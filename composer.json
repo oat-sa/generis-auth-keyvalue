@@ -1,8 +1,7 @@
 {
-    "name" : "oat-sa/keyvalue-authentication",
+    "name" : "oat-sa/generis-auth-keyvalue",
     "description" : "Generis key value authentication",
     "type" : "library",
-    "version" : "0.1",
     "support": {
         "forum": "http://forum.taotesting.com",
         "issues": "http://forge.taotesting.com"
@@ -10,7 +9,8 @@
     "keywords" : [
         "tao",
         "oat",
-        "computer-based-assessment"
+        "computer-based-assessment",
+        "authentication"
     ],
     "autoload" : {
         "psr-4" : {
@@ -24,6 +24,7 @@
     "minimum-stability" : "dev",
     "require-dev": {
         "phpunit/phpunit": "4.1.*",
-        "phpunit/php-code-coverage": "2.*"
+        "phpunit/php-code-coverage": "2.*",
+        "oat-sa/generis": "*"
     }
 }
