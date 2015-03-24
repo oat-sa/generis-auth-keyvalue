@@ -75,41 +75,4 @@ class DataMigration {
         }
 
     }
-
-    /**
-     * Function that will generate key value user in redis database
-     */
-    public static function generateKeyValueUser()
-    {
-        $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueUserService::PREFIXES_KEY);
-
-        $generationId = substr( md5(rand()), 0, 3);
-
-        $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoGroups');
-
-
-        for ($i = 0; $i < 1000; $i++) {
-            $login = 'tt'.$i;
-            $password = core_kernel_users_Service::getPasswordHash()->encrypt('pass'.$i);
-
-            $uri = \common_Utils::getNewUri();
-
-            $tt = array(
-                'uri' => $uri,
-                RDFS_LABEL => 'Test taker '.$i,
-                PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_LOGIN	=> $login,
-                PROPERTY_USER_PASSWORD => $password,
-                PROPERTY_USER_ROLES => array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'),
-                PROPERTY_USER_FIRSTNAME => 'Testtaker '.$i,
-                PROPERTY_USER_LASTNAME => 'Family '.$generationId
-            );
-
-            $kvStore->hset(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, PROPERTY_USER_PASSWORD, $password);
-            $kvStore->hset(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, 'parameters', json_encode($tt) );
-
-        }
-    }
-
 } 

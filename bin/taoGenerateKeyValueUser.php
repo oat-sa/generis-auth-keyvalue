@@ -31,5 +31,5 @@ $rawStart = $root.'tao'.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'raw_
 
 require_once $rawstart;
 
-oat\authKeyValue\helpers\DataMigration::generateKeyValueUser();
+oat\authKeyValue\helpers\DataGeneration::generateKeyValueUser();
 echo 'Test taker created'.PHP_EOL;
