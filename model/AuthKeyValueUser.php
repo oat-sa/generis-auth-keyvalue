@@ -33,7 +33,7 @@ use common_user_User;
 use core_kernel_classes_Resource;
 use core_kernel_classes_Property;
 use common_Logger;
-use SebastianBergmann\Exporter\Exception;
+use Exception;
 
 class AuthKeyValueUser extends common_user_User {
 
@@ -44,7 +44,7 @@ class AuthKeyValueUser extends common_user_User {
     /**
      * @var array
      */
-    protected $userRawParameters;
+    protected $userRawParameters = array();
 
     /**
      * @var array
@@ -55,9 +55,6 @@ class AuthKeyValueUser extends common_user_User {
      * @var string
      */
     protected $identifier;
-
-    /** @var  array $roles */
-    protected $roles;
 
     /**
      * Array that contains the language code as a single string  
@@ -88,7 +85,6 @@ class AuthKeyValueUser extends common_user_User {
     {
         return $this->configuration;
     }
-
 
     /**
      * Sets the language URI
@@ -133,15 +129,15 @@ class AuthKeyValueUser extends common_user_User {
         return $this->userExtraParameters;
     }
 
-
-
     /**
-     * @param rray $userRawParameters
+     * @param array $userRawParameters
      * @return AuthKeyValueUser
      */
     public function setUserRawParameters(array $userRawParameters)
     {
-        $this->userRawParameters = $userRawParameters;
+        foreach ($userRawParameters as $key => $value) {
+            $this->userRawParameters[$key] = is_array($value) ? $value : array($value);
+        }
 
         return $this;
     }
@@ -203,7 +199,7 @@ class AuthKeyValueUser extends common_user_User {
      */
     public function getPropertyValues($property)
     {
-        $returnValue = null;
+        $returnValue = array();
 
         $userParameters = $this->getUserRawParameters();
 
@@ -216,13 +212,11 @@ class AuthKeyValueUser extends common_user_User {
                 case PROPERTY_USER_UILG :
                     $returnValue = $this->getLanguageUi();
                     break;
-                case PROPERTY_USER_ROLES :
-                    $returnValue = $this->getRoles();
-                    break;
                 default:
-                    $returnValue = array($userParameters[$property]);
+                    $returnValue = $userParameters[$property];
             }
         } else {
+            /*
             $extraParameters = $this->getUserExtraParameters();
             // the element has already been accessed
             if(!empty($extraParameters) && array_key_exists($property, $extraParameters)){
@@ -250,6 +244,7 @@ class AuthKeyValueUser extends common_user_User {
 
                 $returnValue = array($parameter);
             }
+            */
 
         }
 
@@ -268,24 +263,6 @@ class AuthKeyValueUser extends common_user_User {
 
         $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
         $this->setUserRawParameters($params);
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getRoles() {
-        return $this->roles;
-    }
-
-    /**
-     * @param array $roles
-     * @return $this
-     */
-    public function setRoles(array $roles ) {
-        $this->roles = $roles;
-
-        return $this;
     }
 
 }

@@ -34,6 +34,7 @@ use core_kernel_users_InvalidLoginException;
 use core_kernel_users_AuthAdapter;
 use oat\authKeyValue\model\AuthKeyValueUserService;
 use oat\oatbox\user\auth\LoginAdapter;
+use oat\oatbox\Configurable;
 
 
 /**
@@ -42,7 +43,7 @@ use oat\oatbox\user\auth\LoginAdapter;
  * @author Christophe Massin <christope@taotesting.com>
  *
  */
-class AuthKeyValueAdapter implements LoginAdapter
+class AuthKeyValueAdapter extends Configurable implements LoginAdapter
 {
 
     /** Key used to retrieve the persistence information */
@@ -54,35 +55,15 @@ class AuthKeyValueAdapter implements LoginAdapter
     /** @var  $password string */
     private $password;
 
-    /** @var $configuration array $configuration  */
-    protected $configuration;
-
-
-    /**
-     * @param array $configuration
-     */
-    public function __construct(array $configuration) {
-        $this->configuration = $configuration;
-
     /**
      * Set the credential
      *
      * @param string $login
      * @param string $password
      */
-    }
-
     public function setCredentials($login, $password){
         $this->username = $login;
         $this->password = $password;
-    }
-
-    /**
-     * @param array $configuration
-     */
-    public function setConfiguration(array $configuration)
-    {
-        $this->configuration = $configuration;
     }
 
     /**
@@ -90,7 +71,7 @@ class AuthKeyValueAdapter implements LoginAdapter
      */
     public function getConfiguration()
     {
-        return $this->configuration;
+        return $this->getOptions();
     }
 
 	/**
@@ -110,9 +91,8 @@ class AuthKeyValueAdapter implements LoginAdapter
 
             $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
             $user = new AuthKeyValueUser();
-            $user->setConfiguration($this->getConfiguration());
+            $user->setConfiguration($this->getOptions());
             $user->setIdentifier($params['uri']);
-            $user->setRoles($params[PROPERTY_USER_ROLES]);
             $user->setLanguageUi($params[PROPERTY_USER_UILG]);
             $user->setLanguageDefLg($params[PROPERTY_USER_DEFLG]);
             $user->setUserRawParameters($params);
@@ -120,7 +100,7 @@ class AuthKeyValueAdapter implements LoginAdapter
             return $user;
             
         } else {
-            throw new core_kernel_users_InvalidLoginException();
+            throw new core_kernel_users_InvalidLoginException('User "'.$this->username.'" failed key-value authentication.');
         }
 
     }
