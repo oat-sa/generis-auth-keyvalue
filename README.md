@@ -11,7 +11,7 @@ You need to have a redis server installed. You will need to enable redis in the 
 Installation 
 ======================
 
-This system can be added to a projet as a library. You need to add this parameter to your composer.json 
+This system can be added to a projet as a library. You need to add this parameter to your **composer.json** 
 
     "minimum-stability" : "dev",
     "require": {
@@ -22,7 +22,7 @@ Once it's done, run a composer update.
 
 ------------------------------
 
-To enable them, you need to go to config/generis/auth.conf.php and add these lines 
+To enable them, you need to add the AuthKeyValueAdapter to your **config/generis/auth.conf.php**:
 
     return array(
         0 => array(
@@ -35,12 +35,11 @@ To enable them, you need to go to config/generis/auth.conf.php and add these lin
 
 Then the login will try to use this library. 
 
-Be sure you have enable 
+Be sure you have enable  the persistence in **config/generis/persistences.conf.php** by adding:
 
     'authKeyValue' => array(
 	    'driver' => 'phpredis',
             'host' => '127.0.0.1',
             'port' => 6379
-	),
+	)
 
-in the config/generis/persistences.conf.php
