@@ -1,7 +1,7 @@
 keyvalue-authentication
 =======================
 
-A key-value implementation of the Tao user authentication
+A key-value implementation of the Tao 3.0 user authentication
 
 Requirement
 ====================
@@ -11,37 +11,35 @@ You need to have a redis server installed. You will need to enable redis in the 
 Installation 
 ======================
 
-This system can be added to a projet as a library. You need to add this parameter to your composer.json 
+This system can be added to a projet as a library. You need to add this parameter to your **composer.json** 
 
     "minimum-stability" : "dev",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/oat-sa/keyvalue-authentication"
-        }
-    ],
     "require": {
-        "oat-sa/keyvalue-authentication": "dev-library"
+        "oat-sa/generis-auth-keyvalue": "dev-master"
     },
 
 Once it's done, run a composer update. 
 
 ------------------------------
 
-To enable them, you need to go to generis/common/conf/auth.conf.php and add these lines 
+To enable them, you need to add the AuthKeyValueAdapter to your **config/generis/auth.conf.php**:
 
-    array(
-        'driver' => 'core_kernel_users_AuthAdapter',
-    ),
+    return array(
+        0 => array(
+            'driver' => 'oat\\authKeyValue\\AuthKeyValueAdapter',
+        ),
+        1 => array(
+            'driver' => 'oat\\generis\\model\\user\\AuthAdapter'
+        ),
+    );
 
 Then the login will try to use this library. 
 
-Be sure you have enable 
+Be sure you have enable  the persistence in **config/generis/persistences.conf.php** by adding:
 
     'authKeyValue' => array(
 	    'driver' => 'phpredis',
             'host' => '127.0.0.1',
             'port' => 6379
-	),
+	)
 
-in the generis/common/conf/persistences.conf.php

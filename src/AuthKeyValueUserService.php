@@ -27,7 +27,7 @@
 
  */
 
-namespace oat\authKeyValue\model;
+namespace oat\authKeyValue;
 use common_persistence_AdvKeyValuePersistence;
 
 
@@ -38,15 +38,16 @@ class AuthKeyValueUserService {
 
     const USER_PARAMETERS = 'parameters';
 
-    /**
-     * @var \common_persistence_Driver
-     */
-    protected $driver;
-
-
     public function __construct(){
-        $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
-        $this->driver = $kvStore->getDriver();
+        $this->persistence = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
+    }
+    
+    /**
+     * @return common_persistence_AdvKeyValuePersistence
+     */
+    protected function getPersistence()
+    {
+       return $this->persistence; 
     }
 
 
@@ -55,7 +56,7 @@ class AuthKeyValueUserService {
      * @return mixed
      */
     public function getUserData($login){
-        return $this->driver->hGetAll(AuthKeyValueUserService::PREFIXES_KEY.':'.$login);
+        return $this->getPersistence()->hGetAll(AuthKeyValueUserService::PREFIXES_KEY.':'.$login);
     }
 
 
@@ -65,7 +66,7 @@ class AuthKeyValueUserService {
      * @return mixed
      */
     public function getUserParameter($userLogin, $parameter){
-        return $this->driver->get(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter);
+        return $this->getPersistence()->get(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter);
     }
 
     /**
@@ -74,7 +75,7 @@ class AuthKeyValueUserService {
      * @param $value mixed
      */
     public function addUserParameter($userLogin, $parameter, $value){
-        $this->driver->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter, $value);
+        $this->getPersistence()->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter, $value);
     }
 
 
@@ -83,7 +84,7 @@ class AuthKeyValueUserService {
      * @param $parameter string
      */
     public function deleteUserParameter($userLogin, $parameter){
-        $this->driver->del(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter);
+        $this->getPersistence()->del(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter);
     }
 
 
@@ -93,6 +94,6 @@ class AuthKeyValueUserService {
      * @param $value
      */
     public function editUserParameter($userLogin, $parameter, $value){
-        $this->driver->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter, $value);
+        $this->getPersistence()->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$userLogin.':'.$parameter, $value);
     }
 } 

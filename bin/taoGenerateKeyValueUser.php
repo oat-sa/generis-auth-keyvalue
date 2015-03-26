@@ -14,17 +14,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * 
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  * 
  */
 
-/**
- * RAW Bootstraping
- *
- * @author CRP Henri Tudor - TAO Team - {@link http://www.tao.lu}
- * @license GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
- */
-require_once dirname(__FILE__) . '/../../../../../tao/includes/class.Bootstrap.php';
+$parms = $argv;
+array_shift($parms);
 
-$bootStrap = new BootStrap('authKeyValue');
-$bootStrap->start();
+if (count($parms) != 1) {
+    echo 'Usage: '.__FILE__.' TAOROOT'.PHP_EOL;
+    die(1);
+}
+
+$root = rtrim(array_shift($parms), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+$rawStart = $root.'tao'.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'raw_start.php';
+
+require_once $rawstart;
+
+oat\authKeyValue\helpers\DataGeneration::generateKeyValueUser();
+echo 'Test taker created'.PHP_EOL;

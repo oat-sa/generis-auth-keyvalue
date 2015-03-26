@@ -8,7 +8,7 @@
 
 namespace oat\authKeyValue\test;
 
-use oat\authKeyValue\model\AuthKeyValueUser;
+use oat\authKeyValue\AuthKeyValueUser;
 use GenerisPhpUnitTestRunner;
 
 require_once dirname(__FILE__) . '/../../generis/test/GenerisPhpUnitTestRunner.php';

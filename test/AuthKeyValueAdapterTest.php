@@ -8,8 +8,8 @@
 
 namespace oat\authKeyValue\test;
 
-use oat\authKeyValue\model\AuthKeyValueAdapter;
-use oat\authKeyValue\model\AuthKeyValueUser;
+use oat\authKeyValue\AuthKeyValueAdapter;
+use oat\authKeyValue\AuthKeyValueUser;
 use GenerisPhpUnitTestRunner;
 use common_session_SessionManager;
 use common_persistence_AdvKeyValuePersistence;
