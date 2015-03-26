@@ -14,14 +14,8 @@ Installation
 This system can be added to a projet as a library. You need to add this parameter to your composer.json 
 
     "minimum-stability" : "dev",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/oat-sa/keyvalue-authentication"
-        }
-    ],
     "require": {
-        "oat-sa/keyvalue-authentication": "dev-tao30"
+        "oat-sa/generis-auth-keyvalue": "dev-master"
     },
 
 Once it's done, run a composer update. 
@@ -30,9 +24,14 @@ Once it's done, run a composer update.
 
 To enable them, you need to go to config/generis/auth.conf.php and add these lines 
 
-    array(
-        'driver' => 'oat\authKeyValue\AuthKeyValueAdapter',
-    ),
+    return array(
+        0 => array(
+            'driver' => 'oat\\authKeyValue\\AuthKeyValueAdapter',
+        ),
+        1 => array(
+            'driver' => 'oat\\generis\\model\\user\\AuthAdapter'
+        ),
+    );
 
 Then the login will try to use this library. 
 
