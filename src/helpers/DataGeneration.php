@@ -61,18 +61,22 @@ class DataGeneration {
         }
     }
     
-    public static function createUser($data = array())
+    public static function createUser($data = array(), $lang = null)
     {
         if (!isset($data[PROPERTY_USER_LOGIN]) || !isset($data[PROPERTY_USER_PASSWORD])) {
             throw new \common_exception_InconsistentData('Cannot add user without login or password');
+        }
+
+        if(is_null($lang)){
+            $lang = DEFAULT_LANG;
         }
         $login = $data[PROPERTY_USER_LOGIN];
         $password = $data[PROPERTY_USER_PASSWORD];
         
         $defaultData = array(
             RDFS_LABEL => 'Test taker',
-            PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Lang'.DEFAULT_LANG,
-            PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Lang'.DEFAULT_LANG,
+            PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Lang'.$lang,
+            PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Lang'.$lang,
             PROPERTY_USER_ROLES => array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'),
         );
         
