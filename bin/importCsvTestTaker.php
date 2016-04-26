@@ -47,11 +47,8 @@ if (is_null($groupUri)) {
 }
 
 $expected = array(
-    'label' => RDFS_LABEL,
     'login' => PROPERTY_USER_LOGIN,
     'password' => PROPERTY_USER_PASSWORD,
-    'lastname' => PROPERTY_USER_LASTNAME,
-    'firstname' => PROPERTY_USER_FIRSTNAME
 );
 $keys = array_keys($expected);
 $userService = new AuthKeyValueUserService();
