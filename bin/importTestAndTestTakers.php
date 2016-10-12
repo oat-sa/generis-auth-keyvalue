@@ -131,13 +131,23 @@ if (($handle = fopen($csvfile, "r")) !== false) {
                             'object' => $userData[PROPERTY_USER_LOGIN]
                         )
                     );
+                    // insert user data to statements as well to be able to show the user label on the results page
+                    $persistence->insert(
+                        'statements',
+                        array(
+                            'modelid' => 1,
+                            'subject' => $userData['uri'],
+                            'predicate' => RDFS_LABEL,
+                            'object' => $userData[PROPERTY_USER_LOGIN],
+                            'l_language' => $lang
+                        )
+                    );
                 } catch (PDOException $e) {
                     echo 'please make sure that called redis exists with subject,predicate,object' . "\n";
                     echo 'insert as first line : ' . $userData['uri'] . " , " . PROPERTY_USER_LOGIN . " , " . $userData[PROPERTY_USER_LOGIN];
                     die(1);
                 }
             }
-            echo '.';
         }
         $row++;
     }
