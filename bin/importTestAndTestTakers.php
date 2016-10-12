@@ -4,32 +4,42 @@ use oat\authKeyValue\AuthKeyValueUserService;
 use oat\authKeyValue\helpers\DataGeneration;
 use oat\taoGroups\models\GroupsService;
 
+//----------- Set parameters
 $parms = $argv;
 array_shift($parms);
-
-if (count($parms) < 2 || count($parms) > 4) {
-    echo 'Usage: ' . __FILE__ . ' TAOROOT CSVFILE [LANG] [GROUPURI]' . PHP_EOL;
+if (count($parms) < 3 || count($parms) > 4) {
+    echo 'Usage: '.__FILE__.' TAOROOT CSVFILE TEST_PACKAGE [LANG] [GROUPURI]'.PHP_EOL;
     die(1);
 }
-
-$root = rtrim(array_shift($parms), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+$root = rtrim(array_shift($parms), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 $csvfile = array_shift($parms);
+$test_package = array_shift($parms);
 $lang = empty($parms) ? null : array_shift($parms);
 $groupUri = empty($parms) ? null : array_shift($parms);
 
-$rawStart = $root . 'tao' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'raw_start.php';
-
+//----------- Bootstrap
+$rawStart = $root.'tao'.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'raw_start.php';
 if (!file_exists($rawStart)) {
-    echo 'Tao not found at "' . $rawStart . '"' . PHP_EOL;
+    echo 'Tao not found at "'.$rawStart.'"'.PHP_EOL;
     die(1);
 }
 require_once $rawStart;
+require_once $root.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
+common_ext_ExtensionsManager::singleton()->getExtensionById('taoDeliveryRdf');
+common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiTest');
+
+//----------- Check files
 if (!file_exists($csvfile)) {
     echo 'Csv file not found at "' . $csvfile . '"' . PHP_EOL;
     die(1);
 }
+if (!file_exists($test_package)) {
+    echo 'Test package file not found at "' . $test_package . '"' . PHP_EOL;
+    die(1);
+}
 
+//----------- Create GROUP
 if (is_null($groupUri)) {
     $label = 'Group ' . uniqid();
     $groupClass = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
@@ -48,10 +58,14 @@ if (is_null($groupUri)) {
     }
 }
 
-
+//----------- Create "redis" table
+/** @var \common_persistence_SqlPersistence $persistence */
 $persistence = \common_persistence_Manager::getPersistence('default');
+
 try{
+    /** @var \common_persistence_sql_pdo_mysql_SchemaManager $schemaManager */
     $schemaManager = $persistence->getDriver()->getSchemaManager();
+    /** @var \Doctrine\DBAL\Schema\Schema $schema */
     $schema = $schemaManager->createSchema();
 
     if(!$schema->hastable('redis')){
@@ -66,13 +80,14 @@ try{
         foreach ($queries as $query) {
             $persistence->exec($query);
         }
+        echo 'Table named redis created.' . PHP_EOL;
     }
 
 } catch(\Doctrine\DBAL\Schema\SchemaException $e) {
     \common_Logger::i('Database Schema already up to date.');
 }
 
-
+//----------- Import test takers from CSV
 $expected = array(
     'login' => PROPERTY_USER_LOGIN,
     'password' => PROPERTY_USER_PASSWORD,
@@ -82,6 +97,7 @@ $userService = new AuthKeyValueUserService();
 
 $row = 1;
 if (($handle = fopen($csvfile, "r")) !== false) {
+    echo 'Importing test takers...';
     while (($data = fgetcsv($handle, 1000, ";")) !== false) {
         if ($row === 1) {
 //            if (json_encode($data) != json_encode(array_keys($expected))) {
@@ -121,10 +137,31 @@ if (($handle = fopen($csvfile, "r")) !== false) {
                     die(1);
                 }
             }
-
-
+            echo '.';
         }
         $row++;
     }
     fclose($handle);
+
+    echo PHP_EOL . $row . ' test takers imported.' . PHP_EOL;
 }
+
+//----------- Import test from ZIP package
+echo 'Importing test...' . PHP_EOL;
+$report =   \taoQtiTest_models_classes_QtiTestService::singleton()->importMultipleTests(
+                new \core_kernel_classes_Class("http://www.tao.lu/Ontologies/TAOTest.rdf#Test"),
+                $test_package
+            );
+
+foreach($report as $r) {
+    $test = $r->getData()->rdfsResource;
+}
+
+$label = __("Benchmark test");
+$deliveryClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery');
+$report = \oat\taoDeliveryRdf\model\SimpleDeliveryFactory::create($deliveryClass, $test, $label);
+$delivery = $report->getData();
+$property = new \core_kernel_classes_Property(PROPERTY_GROUP_DELVIERY);
+$group->setPropertyValue($property, $delivery);
+
+echo 'Test successfully imported.' . PHP_EOL;
