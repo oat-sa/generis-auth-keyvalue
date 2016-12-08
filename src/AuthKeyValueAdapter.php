@@ -44,8 +44,10 @@ use oat\oatbox\Configurable;
  */
 class AuthKeyValueAdapter extends Configurable implements LoginAdapter
 {
+    /** persistence to use for authentication */
+    CONST OPTION_PERSISTENCE = 'persistence';
 
-    /** Key used to retrieve the persistence information */
+    /** default key used to retrieve the persistence information */
     CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue';
 
     /** @var  $username string */
@@ -79,7 +81,10 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
      */
     public function authenticate() {
 
-        $service = new AuthKeyValueUserService();
+        $id = $this->hasOption(self::OPTION_PERSISTENCE)
+            ? $this->getOption(self::OPTION_PERSISTENCE)
+            : self::KEY_VALUE_PERSISTENCE_ID;
+        $service = new AuthKeyValueUserService($id);
         $userData = $service->getUserData($this->username);
 
         $hashing = core_kernel_users_Service::getPasswordHash();

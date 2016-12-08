@@ -16,10 +16,11 @@ use core_kernel_users_Service;
 
 class DataMigration {
 
-    public static function fromOntologyToKey (){
+    public static function fromOntologyToKey($persistenceID = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
+    {
 
 
-        $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
+        $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence($persistenceID);
         $service = tao_models_classes_UserService::singleton();
         $users = $service->getAllUsers();
 
