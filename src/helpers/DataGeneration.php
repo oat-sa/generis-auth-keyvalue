@@ -61,7 +61,7 @@ class DataGeneration {
         }
     }
     
-    public static function createUser($data = array(), $lang = null)
+    public static function createUser($data = array(), $lang = null, $uri = null)
     {
         if (!isset($data[PROPERTY_USER_LOGIN]) || !isset($data[PROPERTY_USER_PASSWORD])) {
             throw new \common_exception_InconsistentData('Cannot add user without login or password');
@@ -82,7 +82,7 @@ class DataGeneration {
         
         $data = array_merge($defaultData, $data);
         
-        $data['uri'] = \common_Utils::getNewUri();
+        $data['uri'] = (empty($uri)) ? \common_Utils::getNewUri() : $uri;
         
         $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
         $kvStore->hset(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, PROPERTY_USER_PASSWORD, $password);
