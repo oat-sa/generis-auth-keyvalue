@@ -233,11 +233,10 @@ class AuthKeyValueUser extends common_user_User {
 
             } else {
                 // not already accessed, we are going to get it.
-                $serviceUser = new AuthKeyValueUserService();
+                $serviceUser = new AuthKeyValueUserService($this->getPersistenceId());
                 $login = reset($userParameters[PROPERTY_USER_LOGIN]);
                 $value = $serviceUser->getUserParameter($login, $property);
 
-                $config = $this->getConfiguration();
                 if( strlen(base64_encode(serialize($value))) < $this->getMaxCacheSize() ) {
                     $extraParameters[$property] = $value;
                     $this->setUserExtraParameters($extraParameters);
@@ -263,6 +262,13 @@ class AuthKeyValueUser extends common_user_User {
 
         $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
         $this->setUserRawParameters($params);
+    }
+    
+    protected function getPersistenceId() {
+        $config = $this->getConfiguration();
+        return isset($config[AuthKeyValueAdapter::OPTION_PERSISTENCE])
+            ? $config[AuthKeyValueAdapter::OPTION_PERSISTENCE]
+            : AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
     }
     
     protected function getMaxCacheSize() {
