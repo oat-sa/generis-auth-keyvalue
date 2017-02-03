@@ -38,8 +38,9 @@ class AuthKeyValueUserService {
 
     const USER_PARAMETERS = 'parameters';
 
-    public function __construct(){
-        $this->persistence = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
+    public function __construct($id = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
+    {
+        $this->persistence = common_persistence_AdvKeyValuePersistence::getPersistence($id);
     }
     
     /**
