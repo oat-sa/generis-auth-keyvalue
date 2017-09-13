@@ -3,6 +3,7 @@
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\authKeyValue\helpers\DataGeneration;
 use oat\taoGroups\models\GroupsService;
+use oat\taoDeliveryRdf\model\GroupAssignment;
 
 //----------- Set parameters
 $parms = $argv;
@@ -171,7 +172,7 @@ $label = __("Benchmark test");
 $deliveryClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery');
 $report = \oat\taoDeliveryRdf\model\SimpleDeliveryFactory::create($deliveryClass, $test, $label);
 $delivery = $report->getData();
-$property = new \core_kernel_classes_Property(PROPERTY_GROUP_DELVIERY);
+$property = new \core_kernel_classes_Property(GroupAssignment::GROUP_DELIVERY);
 $group->setPropertyValue($property, $delivery);
 
 echo 'Test successfully imported.' . PHP_EOL;
