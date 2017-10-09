@@ -10,6 +10,7 @@ namespace oat\authKeyValue\test;
 
 use oat\authKeyValue\AuthKeyValueUser;
 use GenerisPhpUnitTestRunner;
+use oat\generis\model\GenerisRdf;
 
 require_once dirname(__FILE__) . '/../../generis/test/GenerisPhpUnitTestRunner.php';
 
@@ -87,8 +88,8 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
      */
     public function testPropertyValue(){
 
-        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(PROPERTY_USER_DEFLG));
-        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(PROPERTY_USER_UILG));
+        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG));
+        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_UILG));
 
     }
 
@@ -101,7 +102,7 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
     {
         $this->user->setRoles(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'));
         $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getRoles());
-        $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getPropertyValues(PROPERTY_USER_ROLES));
+        $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_ROLES));
     }
 
 
@@ -115,10 +116,10 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
         // check array is currently empty
         $this->assertEmpty($array);
 
-        $mail = $this->user->getPropertyValues(PROPERTY_USER_MAIL);
+        $mail = $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_MAIL);
 
         $this->assertNotEmpty($this->user->getUserExtraParameters());
-        $this->assertArrayHasKey(PROPERTY_USER_MAIL,$this->user->getUserExtraParameters());
+        $this->assertArrayHasKey(GenerisRdf::PROPERTY_USER_MAIL,$this->user->getUserExtraParameters());
     }
 
 

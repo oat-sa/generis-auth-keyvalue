@@ -13,6 +13,7 @@ use oat\authKeyValue\AuthKeyValueAdapter;
 use tao_models_classes_UserService;
 use oat\authKeyValue\AuthKeyValueUserService;
 use core_kernel_users_Service;
+use oat\generis\model\GenerisRdf;
 
 class DataMigration {
 
@@ -35,28 +36,28 @@ class DataMigration {
             foreach($userData as $property){
 
                 switch($property->predicate){
-                    case PROPERTY_USER_LOGIN :
-                        $userParameterFormatedForDb[PROPERTY_USER_LOGIN] = $property->object;
+                    case GenerisRdf::PROPERTY_USER_LOGIN :
+                        $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_LOGIN] = $property->object;
                         $login = $property->object;
                         break;
-                    case PROPERTY_USER_PASSWORD :
-                        $userParameterFormatedForDb[PROPERTY_USER_PASSWORD] = $property->object;
+                    case GenerisRdf::PROPERTY_USER_PASSWORD :
+                        $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_PASSWORD] = $property->object;
                         $password = $property->object;
                         break;
-                    case PROPERTY_USER_ROLES :
-                        $userParameterFormatedForDb[PROPERTY_USER_ROLES][] = $property->object;
+                    case GenerisRdf::PROPERTY_USER_ROLES :
+                        $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_ROLES][] = $property->object;
                         break;
-                    case PROPERTY_USER_UILG :
-                        $userParameterFormatedForDb[PROPERTY_USER_UILG] = $property->object;
+                    case GenerisRdf::PROPERTY_USER_UILG :
+                        $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_UILG] = $property->object;
                         break;
-                    case PROPERTY_USER_DEFLG :
-                        $userParameterFormatedForDb[PROPERTY_USER_DEFLG] = $property->object;
+                    case GenerisRdf::PROPERTY_USER_DEFLG :
+                        $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_DEFLG] = $property->object;
                         break;
-                    case PROPERTY_USER_FIRSTNAME :
-                        $userParameterFormatedForDb[PROPERTY_USER_FIRSTNAME] = $property->object;
+                    case GenerisRdf::PROPERTY_USER_FIRSTNAME :
+                        $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_FIRSTNAME] = $property->object;
                         break;
-                    case PROPERTY_USER_LASTNAME :
-                        $userParameterFormatedForDb[PROPERTY_USER_LASTNAME] = $property->object;
+                    case GenerisRdf::PROPERTY_USER_LASTNAME :
+                        $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_LASTNAME] = $property->object;
                         break;
                     default :
                         $userParameterFormatedForDbExtraParameters[$property->predicate] = $property->object;
@@ -66,7 +67,7 @@ class DataMigration {
             }
 
 
-            $kvStore->getDriver()->hSet(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, PROPERTY_USER_PASSWORD, $password);
+            $kvStore->getDriver()->hSet(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, GenerisRdf::PROPERTY_USER_PASSWORD, $password);
             $kvStore->getDriver()->hSet(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, 'parameters', json_encode($userParameterFormatedForDb));
 
             foreach($userParameterFormatedForDbExtraParameters as $key => $value ) {

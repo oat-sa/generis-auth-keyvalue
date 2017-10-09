@@ -34,7 +34,7 @@ use core_kernel_users_InvalidLoginException;
 use core_kernel_users_AuthAdapter;
 use oat\oatbox\user\auth\LoginAdapter;
 use oat\oatbox\Configurable;
-
+use oat\generis\model\GenerisRdf;
 
 /**
  * Adapter to authenticate users stored in the key value implementation
@@ -89,7 +89,7 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
 
         $hashing = core_kernel_users_Service::getPasswordHash();
 
-        if( isset($userData[PROPERTY_USER_PASSWORD]) && $hashing->verify($this->password, $userData[PROPERTY_USER_PASSWORD]))
+        if( isset($userData[GenerisRdf::PROPERTY_USER_PASSWORD]) && $hashing->verify($this->password, $userData[GenerisRdf::PROPERTY_USER_PASSWORD]))
         {
             // user is authentified, create the user for the session
 
@@ -97,8 +97,8 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
             $user = new AuthKeyValueUser();
             $user->setConfiguration($this->getOptions());
             $user->setIdentifier($params['uri']);
-            $user->setLanguageUi($params[PROPERTY_USER_UILG]);
-            $user->setLanguageDefLg($params[PROPERTY_USER_DEFLG]);
+            $user->setLanguageUi($params[GenerisRdf::PROPERTY_USER_UILG]);
+            $user->setLanguageDefLg($params[GenerisRdf::PROPERTY_USER_DEFLG]);
             $user->setUserRawParameters($params);
             
             return $user;
