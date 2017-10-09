@@ -5,6 +5,7 @@ use oat\authKeyValue\helpers\DataGeneration;
 use oat\taoGroups\models\GroupsService;
 use oat\generis\model\OntologyRdfs;
 use oat\generis\model\GenerisRdf;
+use oat\tao\model\TaoOntology;
 
 $parms = $argv;
 array_shift($parms);
@@ -34,7 +35,7 @@ if (!file_exists($csvfile)) {
 
 if (is_null($groupUri)) {
     $label = 'Group ' . uniqid();
-    $groupClass = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
+    $groupClass = new \core_kernel_classes_Class(TaoOntology::GROUP_CLASS_URI);
     $group = $groupClass->createInstanceWithProperties(
         array(
             OntologyRdfs::RDFS_LABEL => $label
