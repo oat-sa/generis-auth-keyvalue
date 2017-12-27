@@ -34,6 +34,8 @@ use core_kernel_classes_Resource;
 use core_kernel_classes_Property;
 use common_Logger;
 use Exception;
+use oat\generis\model\OntologyRdf;
+use oat\generis\model\GenerisRdf;
 
 class AuthKeyValueUser extends common_user_User {
 
@@ -101,7 +103,7 @@ class AuthKeyValueUser extends common_user_User {
     {
         $languageResource = new core_kernel_classes_Resource($languageDefLgUri);
 
-        $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(RDF_VALUE));
+        $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_VALUE));
         if($languageCode) {
             $this->languageDefLg = array((string)$languageCode);
         }
@@ -164,7 +166,7 @@ class AuthKeyValueUser extends common_user_User {
     {
         $languageResource = new core_kernel_classes_Resource($languageUri);
 
-        $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(RDF_VALUE));
+        $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_VALUE));
         if($languageCode) {
             $this->languageUi = array((string)$languageCode);
         }
@@ -212,10 +214,10 @@ class AuthKeyValueUser extends common_user_User {
         if( !empty($userParameters) && array_key_exists($property, $userParameters))
         {
             switch ($property) {
-                case PROPERTY_USER_DEFLG :
+                case GenerisRdf::PROPERTY_USER_DEFLG :
                     $returnValue = $this->getLanguageDefLg();
                     break;
-                case PROPERTY_USER_UILG :
+                case GenerisRdf::PROPERTY_USER_UILG :
                     $returnValue = $this->getLanguageUi();
                     break;
                 default:
@@ -234,7 +236,7 @@ class AuthKeyValueUser extends common_user_User {
             } else {
                 // not already accessed, we are going to get it.
                 $serviceUser = new AuthKeyValueUserService($this->getPersistenceId());
-                $login = reset($userParameters[PROPERTY_USER_LOGIN]);
+                $login = reset($userParameters[GenerisRdf::PROPERTY_USER_LOGIN]);
                 $value = $serviceUser->getUserParameter($login, $property);
 
                 if( strlen(base64_encode(serialize($value))) < $this->getMaxCacheSize() ) {
@@ -258,7 +260,7 @@ class AuthKeyValueUser extends common_user_User {
         $this->setUserExtraParameters(null);
 
         $service = new AuthKeyValueUserService();
-        $userData = $service->getUserData($this->getPropertyValues(PROPERTY_USER_LOGIN));
+        $userData = $service->getUserData($this->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN));
 
         $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
         $this->setUserRawParameters($params);
