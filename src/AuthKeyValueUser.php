@@ -41,11 +41,11 @@ class AuthKeyValueUser extends common_user_User {
 
     /**
      * Max size of a property to store in the session in characters
-     * 
+     *
      * @var int
      */
     const DEFAULT_MAX_CACHE_SIZE = 1000;
-    
+
     /** @var  array of configuration */
     protected $configuration;
 
@@ -65,15 +65,15 @@ class AuthKeyValueUser extends common_user_User {
     protected $identifier;
 
     /**
-     * Array that contains the language code as a single string  
-     * 
+     * Array that contains the language code as a single string
+     *
      * @var array
      */
     protected $languageUi = array(DEFAULT_LANG);
 
     /**
      * Array that contains the language code as a single string
-     * 
+     *
      * @var array
      */
     protected $languageDefLg = array(DEFAULT_LANG);
@@ -96,7 +96,7 @@ class AuthKeyValueUser extends common_user_User {
 
     /**
      * Sets the language URI
-     * 
+     *
      * @param string $languageDefLgUri
      */
     public function setLanguageDefLg($languageDefLgUri)
@@ -113,7 +113,7 @@ class AuthKeyValueUser extends common_user_User {
 
     /**
      * Returns the language code
-     * 
+     *
      * @return array
      */
     public function getLanguageDefLg()
@@ -239,12 +239,13 @@ class AuthKeyValueUser extends common_user_User {
                 $login = reset($userParameters[GenerisRdf::PROPERTY_USER_LOGIN]);
                 $value = $serviceUser->getUserParameter($login, $property);
 
-                if( strlen(base64_encode(serialize($value))) < $this->getMaxCacheSize() ) {
-                    $extraParameters[$property] = $value;
-                    $this->setUserExtraParameters($extraParameters);
+                if (!empty($value)) {
+                    if( strlen(base64_encode(serialize($value))) < $this->getMaxCacheSize() ) {
+                        $extraParameters[$property] = $value;
+                        $this->setUserExtraParameters($extraParameters);
+                    }
+                    $returnValue = array($value);
                 }
-
-                $returnValue = array($value);
             }
 
         }
@@ -265,17 +266,17 @@ class AuthKeyValueUser extends common_user_User {
         $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
         $this->setUserRawParameters($params);
     }
-    
+
     protected function getPersistenceId() {
         $config = $this->getConfiguration();
         return isset($config[AuthKeyValueAdapter::OPTION_PERSISTENCE])
             ? $config[AuthKeyValueAdapter::OPTION_PERSISTENCE]
             : AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
     }
-    
+
     protected function getMaxCacheSize() {
         $config = $this->getConfiguration();
-        return isset($config['max_size_cached_element']) ? $config['max_size_cached_element'] : self::DEFAULT_MAX_CACHE_SIZE; 
+        return isset($config['max_size_cached_element']) ? $config['max_size_cached_element'] : self::DEFAULT_MAX_CACHE_SIZE;
     }
 
 }
