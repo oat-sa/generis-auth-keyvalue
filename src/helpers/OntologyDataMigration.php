@@ -15,27 +15,24 @@ use oat\authKeyValue\AuthKeyValueUserService;
 use core_kernel_users_Service;
 use oat\generis\model\GenerisRdf;
 
-class DataMigration {
+class OntologyDataMigration
+{
 
     public static function fromOntologyToKey($persistenceID = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
     {
-
-
         $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence($persistenceID);
         $service = tao_models_classes_UserService::singleton();
         $users = $service->getAllUsers();
 
-        foreach( $users as $user){
-
+        foreach ($users as $user) {
             $userParameterFormatedForDb = array();
             $userParameterFormatedForDbExtraParameters = array();
             $userParameterFormatedForDb['uri'] = $user->getUri();
 
             $userData = $user->getRdfTriples();
 
-            foreach($userData as $property){
-
-                switch($property->predicate){
+            foreach ($userData as $property) {
+                switch ($property->predicate) {
                     case GenerisRdf::PROPERTY_USER_LOGIN :
                         $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_LOGIN] = $property->object;
                         $login = $property->object;
@@ -61,20 +58,24 @@ class DataMigration {
                         break;
                     default :
                         $userParameterFormatedForDbExtraParameters[$property->predicate] = $property->object;
-
                 }
-
             }
 
 
-            $kvStore->getDriver()->hSet(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, GenerisRdf::PROPERTY_USER_PASSWORD, $password);
-            $kvStore->getDriver()->hSet(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, 'parameters', json_encode($userParameterFormatedForDb));
+            $kvStore->getDriver()->hSet(
+                AuthKeyValueUserService::PREFIXES_KEY . ':' . $login,
+                GenerisRdf::PROPERTY_USER_PASSWORD,
+                $password
+            );
+            $kvStore->getDriver()->hSet(
+                AuthKeyValueUserService::PREFIXES_KEY . ':' . $login,
+                'parameters',
+                json_encode($userParameterFormatedForDb)
+            );
 
-            foreach($userParameterFormatedForDbExtraParameters as $key => $value ) {
-                $kvStore->getDriver()->set(AuthKeyValueUserService::PREFIXES_KEY.':'.$login.':'.$key, $value);
+            foreach ($userParameterFormatedForDbExtraParameters as $key => $value) {
+                $kvStore->getDriver()->set(AuthKeyValueUserService::PREFIXES_KEY . ':' . $login . ':' . $key, $value);
             }
-
         }
-
     }
-} 
+}
