@@ -21,10 +21,10 @@ namespace oat\authKeyValue\action;
 
 use common_Exception;
 use common_persistence_AdvKeyValuePersistence;
+use common_persistence_Manager;
 use common_report_Report;
 use oat\authKeyValue\AuthKeyValueAdapter;
 use oat\authKeyValue\AuthKeyValueUserService;
-use oat\authKeyValue\listener\UserListener;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\script\ScriptAction;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
@@ -76,8 +76,8 @@ class ActivateKeyValueAuthentication extends ScriptAction
         $this->getServiceManager()->register(AuthKeyValueUserService::SERVICE_ID, $service);
         $this->report->add(common_report_Report::createSuccess('AuthKeyValueUserService was registered.'));
 
-        $this->registerEvent(UserUpdatedEvent::class, [UserListener::class, 'updateUser']);
-        $this->registerEvent(UserRemovedEvent::class, [UserListener::class, 'removeUser']);
+        $this->registerEvent(UserUpdatedEvent::class, [AuthKeyValueUserService::SERVICE_ID, 'userUpdated']);
+        $this->registerEvent(UserRemovedEvent::class, [AuthKeyValueUserService::SERVICE_ID, 'userRemoved']);
 
         $this->report->add(common_report_Report::createSuccess('User update/remove event listeners registered.'));
 
@@ -104,8 +104,8 @@ class ActivateKeyValueAuthentication extends ScriptAction
             return AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
         }
 
-        /** @var \common_persistence_Manager $persistenceManager */
-        $persistenceManager = $this->getServiceLocator()->get(\common_persistence_Manager::SERVICE_ID);
+        /** @var common_persistence_Manager $persistenceManager */
+        $persistenceManager = $this->getServiceLocator()->get(common_persistence_Manager::SERVICE_ID);
         $persistence = $persistenceManager->getPersistenceById($persistenceId);
         if (!$persistence instanceof common_persistence_AdvKeyValuePersistence) {
             throw new common_Exception(

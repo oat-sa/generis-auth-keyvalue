@@ -27,9 +27,14 @@
 
 namespace oat\authKeyValue;
 
+use common_exception_Error;
 use common_persistence_AdvKeyValuePersistence;
+use core_kernel_classes_Resource;
+use oat\authKeyValue\helpers\OntologyDataMigration;
 use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ConfigurableService;
+use oat\tao\model\event\UserRemovedEvent;
+use oat\tao\model\event\UserUpdatedEvent;
 
 
 class AuthKeyValueUserService extends ConfigurableService
@@ -122,6 +127,29 @@ class AuthKeyValueUserService extends ConfigurableService
      */
     public function setUserParameter($userLogin, $parameter, $value){
         $this->getPersistence()->hSet($this->getParameterStorageKey($userLogin), $parameter, $value);
+    }
+
+    /**
+     * @param UserUpdatedEvent $event
+     * @throws common_exception_Error
+     */
+    public function userUpdated(UserUpdatedEvent $event)
+    {
+        $eventData = $event->jsonSerialize();
+        if (isset($eventData['uri'])) {
+            OntologyDataMigration::cacheUser(new core_kernel_classes_Resource($eventData['uri']));
+        }
+    }
+
+    /**
+     * @param UserRemovedEvent $event
+     */
+    public function userRemoved(UserRemovedEvent $event)
+    {
+        $eventData = $event->jsonSerialize();
+        if (isset($eventData['login'])) {
+            $this->removeUserData($eventData['login']);
+        }
     }
 
     /**
