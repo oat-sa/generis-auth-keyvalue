@@ -65,12 +65,12 @@ class AuthKeyValueUserService
             return;
         }
 
-        $this->getPersistence()->hSet($this->makeStorageKey($login), GenerisRdf::PROPERTY_USER_PASSWORD, $password);
-        $this->getPersistence()->hSet($this->makeStorageKey($login), self::USER_PARAMETERS, json_encode($data) );
+        $this->getPersistence()->hSet($this->getStorageKey($login), GenerisRdf::PROPERTY_USER_PASSWORD, $password);
+        $this->getPersistence()->hSet($this->getStorageKey($login), self::USER_PARAMETERS, json_encode($data) );
 
         foreach ($extraParams as $property => $value) {
             $this->getPersistence()->hSet(
-                $this->makeParameterStorageKey($login),
+                $this->getParameterStorageKey($login),
                 $property,
                 $value
             );
@@ -82,7 +82,7 @@ class AuthKeyValueUserService
      * @return mixed
      */
     public function getUserData($login){
-        return $this->getPersistence()->hGetAll($this->makeStorageKey($login));
+        return $this->getPersistence()->hGetAll($this->getStorageKey($login));
     }
 
     /**
@@ -93,8 +93,8 @@ class AuthKeyValueUserService
         if (empty($login)) {
             return;
         }
-        $this->getPersistence()->del($this->makeStorageKey($login));
-        $this->getPersistence()->del($this->makeParameterStorageKey($login));
+        $this->getPersistence()->del($this->getStorageKey($login));
+        $this->getPersistence()->del($this->getParameterStorageKey($login));
     }
 
     /**
@@ -103,7 +103,7 @@ class AuthKeyValueUserService
      * @return mixed
      */
     public function getUserParameter($userLogin, $parameter){
-        return $this->getPersistence()->hGet($this->makeParameterStorageKey($userLogin), $parameter);
+        return $this->getPersistence()->hGet($this->getParameterStorageKey($userLogin), $parameter);
     }
 
     /**
@@ -112,20 +112,20 @@ class AuthKeyValueUserService
      * @param $value mixed
      */
     public function setUserParameter($userLogin, $parameter, $value){
-        $this->getPersistence()->hSet($this->makeParameterStorageKey($userLogin), $parameter, $value);
+        $this->getPersistence()->hSet($this->getParameterStorageKey($userLogin), $parameter, $value);
     }
 
     /**
      * @param $login
      * @return string
      */
-    private function makeStorageKey($login)
+    private function getStorageKey($login)
     {
         return self::PREFIXES_KEY . ':' . $login;
     }
 
-    private function makeParameterStorageKey($login)
+    private function getParameterStorageKey($login)
     {
-        return $this->makeStorageKey($login) . ':' . self::USER_EXTRA_PARAMETERS;
+        return $this->getStorageKey($login) . ':' . self::USER_EXTRA_PARAMETERS;
     }
 }

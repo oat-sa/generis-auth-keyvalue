@@ -16,17 +16,17 @@ use oat\generis\model\GenerisRdf;
 class OntologyDataMigration
 {
 
-    public static function migrateAllUsers($persistenceID = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
+    public static function cacheAllUsers($persistenceID = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
     {
         $service = tao_models_classes_UserService::singleton();
         $users = $service->getAllUsers();
 
         foreach ($users as $user) {
-            self::migrateUser($user, $persistenceID);
+            self::cacheUser($user, $persistenceID);
         }
     }
 
-    public static function migrateUser($user, $persistenceID = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
+    public static function cacheUser($user, $persistenceID = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
     {
         $service = new AuthKeyValueUserService($persistenceID);
 

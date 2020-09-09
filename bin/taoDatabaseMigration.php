@@ -31,5 +31,5 @@ $rawStart = $root.'tao'.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR.'raw_
 
 require_once $rawStart;
 
-oat\authKeyValue\helpers\OntologyDataMigration::migrateAllUsers();
+oat\authKeyValue\helpers\OntologyDataMigration::cacheAllUsers();
 echo 'migration done'.PHP_EOL;

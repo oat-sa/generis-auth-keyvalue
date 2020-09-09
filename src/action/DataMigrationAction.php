@@ -35,7 +35,7 @@ class DataMigrationAction implements Action
     public function __invoke($params)
     {
         $persistenceId = count($params) > 0 ? array_shift($params) : AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
-        OntologyDataMigration::migrateAllUsers($persistenceId);
+        OntologyDataMigration::cacheAllUsers($persistenceId);
         return \common_report_Report::createSuccess(__('User migrated from ontology to KeyValue storage'));
     }
 }

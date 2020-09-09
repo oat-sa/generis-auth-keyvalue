@@ -30,7 +30,7 @@ class UserListener
     {
         $eventData = $event->jsonSerialize();
         if (isset($eventData['uri'])) {
-            OntologyDataMigration::migrateUser(new \core_kernel_classes_Resource($eventData['uri']));
+            OntologyDataMigration::cacheUser(new \core_kernel_classes_Resource($eventData['uri']));
         }
     }
 
