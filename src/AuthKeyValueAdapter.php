@@ -45,9 +45,6 @@ use oat\generis\model\GenerisRdf;
  */
 class AuthKeyValueAdapter extends Configurable implements LoginAdapter
 {
-    /** persistence to use for authentication */
-    CONST OPTION_PERSISTENCE = 'persistence';
-
     /** default key used to retrieve the persistence information */
     CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue';
 
@@ -81,10 +78,6 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
      * @see common_user_auth_Adapter::authenticate()
      */
     public function authenticate() {
-
-        $id = $this->hasOption(self::OPTION_PERSISTENCE)
-            ? $this->getOption(self::OPTION_PERSISTENCE)
-            : self::KEY_VALUE_PERSISTENCE_ID;
 
         $userData = $this->getAuthKeyValueUserService()->getUserData($this->username);
 

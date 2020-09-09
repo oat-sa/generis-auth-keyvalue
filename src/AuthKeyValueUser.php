@@ -267,13 +267,6 @@ class AuthKeyValueUser extends common_user_User {
         $this->setUserRawParameters($params);
     }
 
-    protected function getPersistenceId() {
-        $config = $this->getConfiguration();
-        return isset($config[AuthKeyValueAdapter::OPTION_PERSISTENCE])
-            ? $config[AuthKeyValueAdapter::OPTION_PERSISTENCE]
-            : AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
-    }
-
     protected function getMaxCacheSize() {
         $config = $this->getConfiguration();
         return isset($config['max_size_cached_element']) ? $config['max_size_cached_element'] : self::DEFAULT_MAX_CACHE_SIZE;

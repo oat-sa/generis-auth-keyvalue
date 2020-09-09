@@ -21,7 +21,6 @@
 namespace oat\authKeyValue\action;
 
 use oat\oatbox\action\Action;
-use oat\authKeyValue\AuthKeyValueAdapter;
 use oat\authKeyValue\helpers\OntologyDataMigration;
 
 class DataMigrationAction implements Action
@@ -34,8 +33,12 @@ class DataMigrationAction implements Action
      */
     public function __invoke($params)
     {
-        $persistenceId = count($params) > 0 ? array_shift($params) : AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
-        OntologyDataMigration::cacheAllUsers($persistenceId);
+        if (count($params) > 0) {
+            $persistenceId = array_shift($params);
+            OntologyDataMigration::cacheAllUsers($persistenceId);
+        } else {
+            OntologyDataMigration::cacheAllUsers();
+        }
         return \common_report_Report::createSuccess(__('User migrated from ontology to KeyValue storage'));
     }
 }
