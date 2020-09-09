@@ -36,6 +36,7 @@ use common_Logger;
 use Exception;
 use oat\generis\model\OntologyRdf;
 use oat\generis\model\GenerisRdf;
+use oat\oatbox\service\ServiceManager;
 
 class AuthKeyValueUser extends common_user_User {
 
@@ -235,9 +236,8 @@ class AuthKeyValueUser extends common_user_User {
 
             } else {
                 // not already accessed, we are going to get it.
-                $serviceUser = new AuthKeyValueUserService($this->getPersistenceId());
                 $login = reset($userParameters[GenerisRdf::PROPERTY_USER_LOGIN]);
-                $value = $serviceUser->getUserParameter($login, $property);
+                $value = $this->getAuthKeyValueUserService()->getUserParameter($login, $property);
 
                 if (!empty($value)) {
                     if( strlen(base64_encode(serialize($value))) < $this->getMaxCacheSize() ) {
@@ -247,7 +247,6 @@ class AuthKeyValueUser extends common_user_User {
                     $returnValue = array($value);
                 }
             }
-
         }
 
         return $returnValue;
@@ -260,8 +259,9 @@ class AuthKeyValueUser extends common_user_User {
     public function refresh() {
         $this->setUserExtraParameters(null);
 
-        $service = new AuthKeyValueUserService();
-        $userData = $service->getUserData($this->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN));
+        $userData = $this->getAuthKeyValueUserService()->getUserData(
+            $this->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN)
+        );
 
         $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
         $this->setUserRawParameters($params);
@@ -279,4 +279,11 @@ class AuthKeyValueUser extends common_user_User {
         return isset($config['max_size_cached_element']) ? $config['max_size_cached_element'] : self::DEFAULT_MAX_CACHE_SIZE;
     }
 
+    /**
+     * @return AuthKeyValueUserService
+     */
+    protected function getAuthKeyValueUserService()
+    {
+        return ServiceManager::getServiceManager()->get(AuthKeyValueUserService::SERVICE_ID);
+    }
 }

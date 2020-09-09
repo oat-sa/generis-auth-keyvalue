@@ -9,6 +9,7 @@
 namespace oat\authKeyValue\helpers;
 
 use oat\authKeyValue\AuthKeyValueAdapter;
+use oat\oatbox\service\ServiceManager;
 use tao_models_classes_UserService;
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\generis\model\GenerisRdf;
@@ -16,20 +17,18 @@ use oat\generis\model\GenerisRdf;
 class OntologyDataMigration
 {
 
-    public static function cacheAllUsers($persistenceID = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
+    public static function cacheAllUsers($persistenceId = null)
     {
         $service = tao_models_classes_UserService::singleton();
         $users = $service->getAllUsers();
 
         foreach ($users as $user) {
-            self::cacheUser($user, $persistenceID);
+            self::cacheUser($user, $persistenceId);
         }
     }
 
-    public static function cacheUser($user, $persistenceID = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
+    public static function cacheUser($user, $persistenceId = null)
     {
-        $service = new AuthKeyValueUserService($persistenceID);
-
         $userParameterFormatedForDb = [];
         $userParameterFormatedForDbExtraParameters = [];
         $userParameterFormatedForDb['uri'] = $user->getUri();
@@ -66,6 +65,10 @@ class OntologyDataMigration
             }
         }
 
+        $service = ServiceManager::getServiceManager()->get(AuthKeyValueUserService::SERVICE_ID);
+        if (!empty($persistenceId)) {
+            $service->setOption(AuthKeyValueUserService::OPTION_PERSISTENCE, $persistenceId);
+        }
         $service->removeUserData($login);
         $service->storeUserData(
             $login,

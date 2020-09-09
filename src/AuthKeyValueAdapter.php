@@ -32,6 +32,7 @@ namespace oat\authKeyValue;
 use core_kernel_users_Service;
 use core_kernel_users_InvalidLoginException;
 use core_kernel_users_AuthAdapter;
+use oat\oatbox\service\ServiceManager;
 use oat\oatbox\user\auth\LoginAdapter;
 use oat\oatbox\Configurable;
 use oat\generis\model\GenerisRdf;
@@ -84,8 +85,8 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
         $id = $this->hasOption(self::OPTION_PERSISTENCE)
             ? $this->getOption(self::OPTION_PERSISTENCE)
             : self::KEY_VALUE_PERSISTENCE_ID;
-        $service = new AuthKeyValueUserService($id);
-        $userData = $service->getUserData($this->username);
+
+        $userData = $this->getAuthKeyValueUserService()->getUserData($this->username);
 
         $hashing = core_kernel_users_Service::getPasswordHash();
 
@@ -113,6 +114,11 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
 
     }
 
-
+    /**
+     * @return AuthKeyValueUserService
+     */
+    protected function getAuthKeyValueUserService()
+    {
+        return ServiceManager::getServiceManager()->get(AuthKeyValueUserService::SERVICE_ID);
+    }
 }
-

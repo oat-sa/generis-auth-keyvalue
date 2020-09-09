@@ -26,12 +26,18 @@
  */
 
 namespace oat\authKeyValue;
+
 use common_persistence_AdvKeyValuePersistence;
 use oat\generis\model\GenerisRdf;
+use oat\oatbox\service\ConfigurableService;
 
 
-class AuthKeyValueUserService
+class AuthKeyValueUserService extends ConfigurableService
 {
+
+    const SERVICE_ID = 'tao/AuthKeyValueUserService';
+
+    const OPTION_PERSISTENCE = 'persistence';
 
     const PREFIXES_KEY = 'auth';
     const USER_PARAMETERS = 'parameters';
@@ -39,17 +45,20 @@ class AuthKeyValueUserService
 
     private $persistence;
 
-    public function __construct($id = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)
-    {
-        $this->persistence = common_persistence_AdvKeyValuePersistence::getPersistence($id);
-    }
-
     /**
      * @return common_persistence_AdvKeyValuePersistence
      */
     protected function getPersistence()
     {
-       return $this->persistence;
+        if (empty($this->persistence)) {
+            $persistenceId = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
+            if ($this->hasOption(self::OPTION_PERSISTENCE)) {
+                $persistenceId = $this->getOption(self::OPTION_PERSISTENCE);
+            }
+            $this->persistence = common_persistence_AdvKeyValuePersistence::getPersistence($persistenceId);
+        }
+
+        return $this->persistence;
     }
 
     /**
