@@ -20,11 +20,14 @@
 namespace oat\authKeyValue\action;
 
 use common_Exception;
+use common_exception_Error;
+use common_ext_ExtensionsManager;
 use common_persistence_AdvKeyValuePersistence;
 use common_persistence_Manager;
 use common_report_Report;
 use oat\authKeyValue\AuthKeyValueAdapter;
 use oat\authKeyValue\AuthKeyValueUserService;
+use oat\authKeyValue\listener\UserEventListener;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\script\ScriptAction;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
@@ -70,18 +73,61 @@ class ActivateKeyValueAuthentication extends ScriptAction
     {
         $this->report = common_report_Report::createInfo(__CLASS__ . ' script started.');
 
-        $service = new AuthKeyValueUserService([
-            AuthKeyValueUserService::OPTION_PERSISTENCE => $this->getKeyValuePersistenceId(),
-        ]);
-        $this->getServiceManager()->register(AuthKeyValueUserService::SERVICE_ID, $service);
-        $this->report->add(common_report_Report::createSuccess('AuthKeyValueUserService was registered.'));
-
-        $this->registerEvent(UserUpdatedEvent::class, [AuthKeyValueUserService::SERVICE_ID, 'userUpdated']);
-        $this->registerEvent(UserRemovedEvent::class, [AuthKeyValueUserService::SERVICE_ID, 'userRemoved']);
-
-        $this->report->add(common_report_Report::createSuccess('User update/remove event listeners registered.'));
+        $this->registerAuthKeyValueUserService();
+        $this->registerUserEventListener();
+        $this->registerTestTakerEventListener();
 
         return $this->report;
+    }
+
+    /**
+     * @throws InvalidServiceManagerException
+     * @throws common_exception_Error
+     * @throws common_Exception
+     */
+    private function registerAuthKeyValueUserService()
+    {
+        $service = new AuthKeyValueUserService(
+            [
+                AuthKeyValueUserService::OPTION_PERSISTENCE => $this->getKeyValuePersistenceId(),
+            ]
+        );
+        $this->getServiceManager()->register(AuthKeyValueUserService::SERVICE_ID, $service);
+        $this->report->add(common_report_Report::createSuccess('AuthKeyValueUserService was registered.'));
+    }
+
+    /**
+     * @throws InvalidServiceManagerException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     */
+    private function registerUserEventListener(): void
+    {
+        $listener = new UserEventListener();
+        $this->registerService(UserEventListener::SERVICE_ID, $listener);
+        $this->registerEvent(UserUpdatedEvent::class, [UserEventListener::SERVICE_ID, 'userUpdated']);
+        $this->registerEvent(UserRemovedEvent::class, [UserEventListener::SERVICE_ID, 'userRemoved']);
+
+        $this->report->add(common_report_Report::createSuccess('User update/remove event listeners registered.'));
+    }
+
+    /**
+     * @throws common_exception_Error
+     */
+    private function registerTestTakerEventListener(): void
+    {
+        /** @var common_ext_ExtensionsManager $extManager */
+        $extManager = $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
+        if ($extManager->isInstalled('taoTestTaker')) {
+            $action = $this->propagate(new RegisterTestTakerEventListener());
+            $this->report->add($action([]));
+        } else {
+            $this->report->add(
+                common_report_Report::createInfo(
+                    'TAO TestTaker extension is not installed, test taker event listener not registered.'
+                )
+            );
+        }
     }
 
     /**
@@ -92,21 +138,37 @@ class ActivateKeyValueAuthentication extends ScriptAction
      */
     protected function getKeyValuePersistenceId()
     {
-        $persistenceId = $this->getOption('persistence');
-        if (empty($persistenceId)) {
-            $this->report->add(
-                new common_report_Report(
-                    common_report_Report::TYPE_WARNING,
-                    'Persistence key was not provided to the script. Please configure default "'
-                    . AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID . '" persistence.'
-                )
-            );
-            return AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
+        $persistenceId = $this->getPersistenceFromParameters();
+        if ($persistenceId) {
+            return $persistenceId;
         }
 
-        /** @var common_persistence_Manager $persistenceManager */
-        $persistenceManager = $this->getServiceLocator()->get(common_persistence_Manager::SERVICE_ID);
-        $persistence = $persistenceManager->getPersistenceById($persistenceId);
+        return $this->getDefaultPersistence();
+    }
+
+    /**
+     * @param string $event
+     * @param array $callback
+     * @throws InvalidServiceManagerException
+     * @throws common_Exception
+     */
+    private function registerEvent($event, $callback): void
+    {
+        $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
+        $eventManager->attach($event, $callback);
+        $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+    }
+
+    /**
+     * @throws common_Exception
+     */
+    private function getPersistenceFromParameters()
+    {
+        $persistenceId = $this->getOption('persistence');
+        if (empty($persistenceId)) {
+            return;
+        }
+        $persistence = $this->getPersistenceManager()->getPersistenceById($persistenceId);
         if (!$persistence instanceof common_persistence_AdvKeyValuePersistence) {
             throw new common_Exception(
                 'Given persistence key, "' . $persistenceId . '", is not for an advanced key value persistence.'
@@ -116,16 +178,32 @@ class ActivateKeyValueAuthentication extends ScriptAction
         return $persistenceId;
     }
 
-    /**
-     * @param string $event
-     * @param array $callback
-     * @throws InvalidServiceManagerException
-     * @throws common_Exception
-     */
-    private function registerEvent($event, $callback)
+    private function getDefaultPersistence()
     {
-        $eventManager = $this->getServiceLocator()->get(EventManager::SERVICE_ID);
-        $eventManager->attach($event, $callback);
-        $this->getServiceManager()->register(EventManager::SERVICE_ID, $eventManager);
+        $persistence = $this->getPersistenceManager()->getPersistenceById(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
+        if (empty($persistence)) {
+            $this->report->add(
+                new common_report_Report(
+                    common_report_Report::TYPE_WARNING,
+                    'Persistence key was not provided to the script. Please configure default "'
+                    . AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID . '" persistence.'
+                )
+            );
+        } else if (!$persistence instanceof common_persistence_AdvKeyValuePersistence) {
+            throw new common_Exception(
+                'Configuration found for default persistence "' . AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID . '", but it is incorrect, it must be advanced key value persistence.'
+            );
+        }
+
+        return AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
+    }
+
+    /**
+     * @return common_persistence_Manager
+     */
+    private function getPersistenceManager()
+    {
+        /** @var common_persistence_Manager $persistenceManager */
+        return $this->getServiceLocator()->get(common_persistence_Manager::SERVICE_ID);
     }
 }

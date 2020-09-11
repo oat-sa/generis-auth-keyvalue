@@ -19,6 +19,7 @@
 
 namespace oat\authKeyValue\helpers;
 
+use core_kernel_classes_Resource;
 use oat\oatbox\service\ServiceManager;
 use tao_models_classes_UserService;
 use oat\authKeyValue\AuthKeyValueUserService;
@@ -33,45 +34,44 @@ class OntologyDataMigration
         $users = $service->getAllUsers();
 
         foreach ($users as $user) {
-            self::cacheUser($user, $persistenceId);
+            self::cacheUser($user->getUri(), $persistenceId);
         }
     }
 
-    public static function cacheUser($user, $persistenceId = null)
+    public static function cacheUser($userUri, $persistenceId = null)
     {
-        $userParameterFormatedForDb = [];
-        $userParameterFormatedForDbExtraParameters = [];
-        $userParameterFormatedForDb['uri'] = $user->getUri();
+        $userData = [];
+        $userExtraData = [];
+        $userData['uri'] = $userUri;
 
-        $userData = $user->getRdfTriples();
-
-        foreach ($userData as $property) {
+        $user = new core_kernel_classes_Resource($userUri);
+        foreach ($user->getRdfTriples() as $property) {
             switch ($property->predicate) {
                 case GenerisRdf::PROPERTY_USER_LOGIN :
-                    $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_LOGIN] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_LOGIN] = $property->object;
                     $login = $property->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_PASSWORD :
-                    $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_PASSWORD] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_PASSWORD] = $property->object;
                     $password = $property->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_ROLES :
-                    $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_ROLES][] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_ROLES][] = $property->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_UILG :
-                    $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_UILG] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_UILG] = $property->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_DEFLG :
-                    $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_DEFLG] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_DEFLG] = $property->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_FIRSTNAME :
-                    $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_FIRSTNAME] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_FIRSTNAME] = $property->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_LASTNAME :
-                    $userParameterFormatedForDb[GenerisRdf::PROPERTY_USER_LASTNAME] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_LASTNAME] = $property->object;
                     break;
                 default :
-                    $userParameterFormatedForDbExtraParameters[$property->predicate] = $property->object;
+                    $userExtraData[$property->predicate] = $property->object;
             }
         }
 
@@ -79,12 +79,7 @@ class OntologyDataMigration
         if (!empty($persistenceId)) {
             $service->setOption(AuthKeyValueUserService::OPTION_PERSISTENCE, $persistenceId);
         }
-        $service->removeUserData($login);
-        $service->storeUserData(
-            $login,
-            $password,
-            $userParameterFormatedForDb,
-            $userParameterFormatedForDbExtraParameters
-        );
+        $service->removeUserData($userUri);
+        $service->storeUserData($userUri, $login, $password, $userData, $userExtraData);
     }
 }

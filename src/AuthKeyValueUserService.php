@@ -27,20 +27,16 @@
 
 namespace oat\authKeyValue;
 
-use common_exception_Error;
+use common_Exception;
 use common_persistence_AdvKeyValuePersistence;
-use core_kernel_classes_Resource;
-use oat\authKeyValue\helpers\OntologyDataMigration;
 use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ConfigurableService;
-use oat\tao\model\event\UserRemovedEvent;
-use oat\tao\model\event\UserUpdatedEvent;
 
 
 class AuthKeyValueUserService extends ConfigurableService
 {
 
-    const SERVICE_ID = 'tao/AuthKeyValueUserService';
+    const SERVICE_ID = 'authKeyValue/UserService';
 
     const OPTION_PERSISTENCE = 'persistence';
 
@@ -71,14 +67,15 @@ class AuthKeyValueUserService extends ConfigurableService
      * @param string $password
      * @param array $data
      * @param array $extraParams
-     * @throws \common_Exception
+     * @throws common_Exception
      */
-    public function storeUserData($login, $password, array $data, array $extraParams = [])
+    public function storeUserData($uri, $login, $password, array $data, array $extraParams = [])
     {
         if (empty($login) || empty($password)) {
             return;
         }
 
+        $this->getPersistence()->set($this->getUriMapKey($uri), $login);
         $this->getPersistence()->hSet($this->getStorageKey($login), GenerisRdf::PROPERTY_USER_PASSWORD, $password);
         $this->getPersistence()->hSet($this->getStorageKey($login), self::USER_PARAMETERS, json_encode($data) );
 
@@ -100,15 +97,17 @@ class AuthKeyValueUserService extends ConfigurableService
     }
 
     /**
-     * @param string $login
+     * @param string $userUri
      */
-    public function removeUserData($login)
+    public function removeUserData($userUri)
     {
+        $login = $this->findUserLoginFromUri($userUri);
         if (empty($login)) {
             return;
         }
         $this->getPersistence()->del($this->getStorageKey($login));
         $this->getPersistence()->del($this->getParameterStorageKey($login));
+        $this->getPersistence()->del($this->getUriMapKey($userUri));
     }
 
     /**
@@ -129,31 +128,13 @@ class AuthKeyValueUserService extends ConfigurableService
         $this->getPersistence()->hSet($this->getParameterStorageKey($userLogin), $parameter, $value);
     }
 
-    /**
-     * @param UserUpdatedEvent $event
-     * @throws common_exception_Error
-     */
-    public function userUpdated(UserUpdatedEvent $event)
+    private function findUserLoginFromUri($userUri)
     {
-        $eventData = $event->jsonSerialize();
-        if (isset($eventData['uri'])) {
-            OntologyDataMigration::cacheUser(new core_kernel_classes_Resource($eventData['uri']));
-        }
+        return $this->getPersistence()->get($this->getUriMapKey($userUri));
     }
 
     /**
-     * @param UserRemovedEvent $event
-     */
-    public function userRemoved(UserRemovedEvent $event)
-    {
-        $eventData = $event->jsonSerialize();
-        if (isset($eventData['login'])) {
-            $this->removeUserData($eventData['login']);
-        }
-    }
-
-    /**
-     * @param $login
+     * @param string $login
      * @return string
      */
     private function getStorageKey($login)
@@ -161,8 +142,21 @@ class AuthKeyValueUserService extends ConfigurableService
         return self::PREFIXES_KEY . ':' . $login;
     }
 
+    /**
+     * @param string $login
+     * @return string
+     */
     private function getParameterStorageKey($login)
     {
         return $this->getStorageKey($login) . ':' . self::USER_EXTRA_PARAMETERS;
+    }
+
+    /**
+     * @param string $userUri
+     * @return string
+     */
+    private function getUriMapKey($userUri)
+    {
+        return self::PREFIXES_KEY . ':' . $userUri;
     }
 }
