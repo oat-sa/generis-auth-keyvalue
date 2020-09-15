@@ -257,11 +257,10 @@ class AuthKeyValueUser extends common_user_User {
      * Function that will refresh the parameters.
      */
     public function refresh() {
-        $this->setUserExtraParameters(null);
+        $this->setUserExtraParameters([]);
 
-        $userData = $this->getAuthKeyValueUserService()->getUserData(
-            $this->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN)
-        );
+        $login = current($this->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN));
+        $userData = $this->getAuthKeyValueUserService()->getUserData($login);
 
         $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
         $this->setUserRawParameters($params);

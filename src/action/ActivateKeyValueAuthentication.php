@@ -31,6 +31,7 @@ use oat\authKeyValue\listener\UserEventListener;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\script\ScriptAction;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
+use oat\oatbox\user\auth\AuthFactory;
 use oat\tao\model\event\UserRemovedEvent;
 use oat\tao\model\event\UserUpdatedEvent;
 
@@ -42,12 +43,12 @@ class ActivateKeyValueAuthentication extends ScriptAction
     protected function provideOptions()
     {
         return [
-            'persistence' => array(
+            'persistence' => [
                 'prefix' => 'p',
                 'longPrefix' => 'persistence',
                 'required' => false,
                 'description' => 'Persistence key, which will be used for user cache.',
-            ),
+            ],
         ];
     }
 
@@ -74,6 +75,7 @@ class ActivateKeyValueAuthentication extends ScriptAction
         $this->report = common_report_Report::createInfo(__CLASS__ . ' script started.');
 
         $this->registerAuthKeyValueUserService();
+        $this->registerAuthKeyValueAdapter();
         $this->registerUserEventListener();
         $this->registerTestTakerEventListener();
 
@@ -94,6 +96,23 @@ class ActivateKeyValueAuthentication extends ScriptAction
         );
         $this->getServiceManager()->register(AuthKeyValueUserService::SERVICE_ID, $service);
         $this->report->add(common_report_Report::createSuccess('AuthKeyValueUserService was registered.'));
+    }
+
+    private function registerAuthKeyValueAdapter()
+    {
+        $generisExtension = $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID)->getExtensionById('generis');
+
+        $auths = $generisExtension->getConfig(AuthFactory::CONFIG_KEY);
+        foreach ($auths as $authConfig) {
+            if (isset($authConfig['driver']) && $authConfig['driver'] === AuthKeyValueAdapter::class) {
+                $this->report->add(common_report_Report::createInfo('AuthKeyValueAdapter already configured.'));
+                return;
+            }
+        }
+
+        array_unshift($auths, ['driver' => AuthKeyValueAdapter::class]);
+        $generisExtension->setConfig(AuthFactory::CONFIG_KEY, $auths);
+        $this->report->add(common_report_Report::createSuccess('AuthKeyValueAdapter configured successfully.'));
     }
 
     /**
@@ -166,7 +185,7 @@ class ActivateKeyValueAuthentication extends ScriptAction
     {
         $persistenceId = $this->getOption('persistence');
         if (empty($persistenceId)) {
-            return;
+            return null;
         }
         $persistence = $this->getPersistenceManager()->getPersistenceById($persistenceId);
         if (!$persistence instanceof common_persistence_AdvKeyValuePersistence) {
@@ -180,8 +199,7 @@ class ActivateKeyValueAuthentication extends ScriptAction
 
     private function getDefaultPersistence()
     {
-        $persistence = $this->getPersistenceManager()->getPersistenceById(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
-        if (empty($persistence)) {
+        if (!$this->getPersistenceManager()->hasPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID)) {
             $this->report->add(
                 new common_report_Report(
                     common_report_Report::TYPE_WARNING,
@@ -189,7 +207,14 @@ class ActivateKeyValueAuthentication extends ScriptAction
                     . AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID . '" persistence.'
                 )
             );
-        } else if (!$persistence instanceof common_persistence_AdvKeyValuePersistence) {
+
+            return AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
+        }
+
+        $persistence = $this->getPersistenceManager()->getPersistenceById(
+            AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID
+        );
+        if (!$persistence instanceof common_persistence_AdvKeyValuePersistence) {
             throw new common_Exception(
                 'Configuration found for default persistence "' . AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID . '", but it is incorrect, it must be advanced key value persistence.'
             );
