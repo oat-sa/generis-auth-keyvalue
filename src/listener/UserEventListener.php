@@ -29,8 +29,6 @@ use oat\tao\model\event\UserUpdatedEvent;
 
 class UserEventListener extends ConfigurableService
 {
-    public const SERVICE_ID = 'authKeyValue/UserEventListener';
-
     /**
      * @param UserUpdatedEvent $event
      * @throws common_exception_Error

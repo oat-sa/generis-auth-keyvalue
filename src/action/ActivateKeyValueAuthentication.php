@@ -122,10 +122,8 @@ class ActivateKeyValueAuthentication extends ScriptAction
      */
     private function registerUserEventListener(): void
     {
-        $listener = new UserEventListener();
-        $this->registerService(UserEventListener::SERVICE_ID, $listener);
-        $this->registerEvent(UserUpdatedEvent::class, [UserEventListener::SERVICE_ID, 'userUpdated']);
-        $this->registerEvent(UserRemovedEvent::class, [UserEventListener::SERVICE_ID, 'userRemoved']);
+        $this->registerEvent(UserUpdatedEvent::class, [UserEventListener::class, 'userUpdated']);
+        $this->registerEvent(UserRemovedEvent::class, [UserEventListener::class, 'userRemoved']);
 
         $this->report->add(common_report_Report::createSuccess('User update/remove event listeners registered.'));
     }

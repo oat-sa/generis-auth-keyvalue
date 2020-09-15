@@ -19,7 +19,6 @@
 
 namespace oat\authKeyValue\listener;
 
-use core_kernel_classes_Resource;
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\authKeyValue\helpers\OntologyDataMigration;
 use oat\oatbox\service\ConfigurableService;
@@ -28,8 +27,6 @@ use oat\taoTestTaker\models\events\TestTakerRemovedEvent;
 
 class TestTakerEventListener extends ConfigurableService
 {
-    public const SERVICE_ID = 'authKeyValue/TestTakerEventListener';
-
     public function testTakerUpdated(AbstractTestTakerEvent $event)
     {
         $eventData = $event->jsonSerialize();

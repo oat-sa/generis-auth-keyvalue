@@ -33,15 +33,12 @@ class RegisterTestTakerEventListener extends InstallAction
 {
     /**
      * @param $params
-     * @throws common_Exception
      */
     public function __invoke($params)
     {
-        $listener = new TestTakerEventListener();
-        $this->registerService(TestTakerEventListener::SERVICE_ID, $listener);
-        $this->registerEvent(TestTakerUpdatedEvent::class, [TestTakerEventListener::SERVICE_ID, 'testTakerUpdated']);
-        $this->registerEvent(TestTakerImportedEvent::class, [TestTakerEventListener::SERVICE_ID, 'testTakerUpdated']);
-        $this->registerEvent(TestTakerRemovedEvent::class, [TestTakerEventListener::SERVICE_ID, 'testTakerRemoved']);
+        $this->registerEvent(TestTakerUpdatedEvent::class, [TestTakerEventListener::class, 'testTakerUpdated']);
+        $this->registerEvent(TestTakerImportedEvent::class, [TestTakerEventListener::class, 'testTakerUpdated']);
+        $this->registerEvent(TestTakerRemovedEvent::class, [TestTakerEventListener::class, 'testTakerRemoved']);
 
         return \common_report_Report::createSuccess('Test taker update/import/remove event listeners registered.');
     }
