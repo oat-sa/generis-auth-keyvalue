@@ -23,6 +23,7 @@ namespace oat\authKeyValue\test\unit;
 
 use common_persistence_AdvKeyValuePersistence;
 use oat\authKeyValue\AuthKeyValueUserService;
+use oat\generis\persistence\PersistenceManager;
 use oat\generis\test\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -37,9 +38,15 @@ class AuthKeyValueUserServiceTest extends TestCase
 
     public function setUp(): void
     {
-        $this->service = $this->createPartialMock(AuthKeyValueUserService::class, ['getPersistence']);
+        $persistenceManagerMock = $this->createMock(PersistenceManager::class);
         $this->persistenceMock = $this->createMock(common_persistence_AdvKeyValuePersistence::class);
-        $this->service->method('getPersistence')->willReturn($this->persistenceMock);
+        $persistenceManagerMock->method('getPersistenceById')->willReturn($this->persistenceMock);
+        $this->service = new AuthKeyValueUserService([AuthKeyValueUserService::OPTION_PERSISTENCE => 'persistence']);
+        $this->service->setServiceLocator(
+            $this->getServiceLocatorMock([
+                PersistenceManager::SERVICE_ID => $persistenceManagerMock,
+            ])
+        );
     }
 
     public function testStoreUserData_WhenLoginOrPasswordEmpty_ThenNoRecordStored(): void

@@ -28,6 +28,7 @@ use common_report_Report;
 use oat\authKeyValue\AuthKeyValueAdapter;
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\authKeyValue\listener\UserEventListener;
+use oat\generis\persistence\PersistenceManager;
 use oat\oatbox\event\EventManager;
 use oat\oatbox\extension\script\ScriptAction;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
@@ -222,11 +223,10 @@ class ActivateKeyValueAuthentication extends ScriptAction
     }
 
     /**
-     * @return common_persistence_Manager
+     * @return PersistenceManager
      */
     private function getPersistenceManager()
     {
-        /** @var common_persistence_Manager $persistenceManager */
-        return $this->getServiceLocator()->get(common_persistence_Manager::SERVICE_ID);
+        return $this->getServiceLocator()->get(PersistenceManager::SERVICE_ID);
     }
 }
