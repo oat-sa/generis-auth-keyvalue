@@ -22,7 +22,7 @@ Once it's done, run a composer update.
 
 ------------------------------
 
-Be sure to have a key value persistence registered that will be used for caching. The default persistence identifier is `authKeyValue`, but you will be able to configure which one will be used. Here is an example of registered redis persistence in in **config/generis/persistences.conf.php** by adding:
+Be sure to have a key value persistence registered that will be used for caching. The default persistence identifier is `authKeyValue`, but you will be able to configure which one will be used. Here is an example of registered redis persistence in **config/generis/persistences.conf.php**:
 
     'authKeyValue' => array(
         'driver' => 'phpredis',
@@ -33,7 +33,7 @@ Be sure to have a key value persistence registered that will be used for caching
 ------------------------------
 
 
-To enable the enable the authentication cache you have to run an install script:
+To enable the authentication cache you have to run an install script:
 
     php index.php 'oat\authKeyValue\action\ActivateKeyValueAuthentication' --persistence authKeyValue
 
