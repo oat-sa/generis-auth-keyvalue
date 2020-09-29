@@ -2,7 +2,11 @@
 
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\authKeyValue\helpers\DataGeneration;
+use oat\oatbox\service\ServiceManager;
 use oat\taoGroups\models\GroupsService;
+use oat\generis\model\OntologyRdfs;
+use oat\generis\model\GenerisRdf;
+use oat\tao\model\TaoOntology;
 
 $parms = $argv;
 array_shift($parms);
@@ -32,10 +36,10 @@ if (!file_exists($csvfile)) {
 
 if (is_null($groupUri)) {
     $label = 'Group ' . uniqid();
-    $groupClass = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
+    $groupClass = new \core_kernel_classes_Class(TaoOntology::GROUP_CLASS_URI);
     $group = $groupClass->createInstanceWithProperties(
         array(
-            RDFS_LABEL => $label
+            OntologyRdfs::RDFS_LABEL => $label
         )
     );
     echo 'Group "' . $label . '" created.' . PHP_EOL;
@@ -74,11 +78,11 @@ try{
 
 
 $expected = array(
-    'login' => PROPERTY_USER_LOGIN,
-    'password' => PROPERTY_USER_PASSWORD,
+    'login' => GenerisRdf::PROPERTY_USER_LOGIN,
+    'password' => GenerisRdf::PROPERTY_USER_PASSWORD,
 );
 $keys = array_keys($expected);
-$userService = new AuthKeyValueUserService();
+$userService = ServiceManager::getServiceManager()->get(AuthKeyValueUserService::SERVICE_ID);
 
 $row = 1;
 if (($handle = fopen($csvfile, "r")) !== false) {
@@ -97,12 +101,12 @@ if (($handle = fopen($csvfile, "r")) !== false) {
             }
 
             // encode password
-            $toAdd[PROPERTY_USER_PASSWORD] = core_kernel_users_Service::getPasswordHash()->encrypt(
-                $toAdd[PROPERTY_USER_PASSWORD]
+            $toAdd[GenerisRdf::PROPERTY_USER_PASSWORD] = core_kernel_users_Service::getPasswordHash()->encrypt(
+                $toAdd[GenerisRdf::PROPERTY_USER_PASSWORD]
             );
 
-            if ($userService->getUserData($toAdd[PROPERTY_USER_LOGIN]) != false) {
-                echo 'User "' . $toAdd[PROPERTY_USER_LOGIN] . '" already exists.' . PHP_EOL;
+            if ($userService->getUserData($toAdd[GenerisRdf::PROPERTY_USER_LOGIN]) != false) {
+                echo 'User "' . $toAdd[GenerisRdf::PROPERTY_USER_LOGIN] . '" already exists.' . PHP_EOL;
             } else {
                 $userData = DataGeneration::createUser($toAdd, $lang);
 
@@ -111,13 +115,13 @@ if (($handle = fopen($csvfile, "r")) !== false) {
                         'redis',
                         array(
                             'subject' => $userData['uri'],
-                            'predicate' => PROPERTY_USER_LOGIN,
-                            'object' => $userData[PROPERTY_USER_LOGIN]
+                            'predicate' => GenerisRdf::PROPERTY_USER_LOGIN,
+                            'object' => $userData[GenerisRdf::PROPERTY_USER_LOGIN]
                         )
                     );
                 } catch (PDOException $e) {
                     echo 'please make sure that called redis exists with subject,predicate,object' . "\n";
-                    echo 'insert as first line : ' . $userData['uri'] . " , " . PROPERTY_USER_LOGIN . " , " . $userData[PROPERTY_USER_LOGIN];
+                    echo 'insert as first line : ' . $userData['uri'] . " , " . GenerisRdf::PROPERTY_USER_LOGIN . " , " . $userData[GenerisRdf::PROPERTY_USER_LOGIN];
                     die(1);
                 }
             }

@@ -6,7 +6,7 @@
  * Time: 10:49
  */
 
-namespace oat\authKeyValue\test;
+namespace oat\authKeyValue\test\integration;
 
 use oat\authKeyValue\AuthKeyValueAdapter;
 use oat\authKeyValue\AuthKeyValueUser;
@@ -15,6 +15,7 @@ use common_session_SessionManager;
 use common_persistence_AdvKeyValuePersistence;
 use core_kernel_users_Service;
 use common_Utils;
+use oat\generis\model\GenerisRdf;
 
 require_once dirname(__FILE__) . '/../../generis/test/GenerisPhpUnitTestRunner.php';
 
@@ -36,7 +37,7 @@ class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
         if ( ! $user ){
 
             $uri = \common_Utils::getNewUri();
-            $kvStore->getDriver()->hset($this->login,PROPERTY_USER_PASSWORD, '');
+            $kvStore->getDriver()->hset($this->login,GenerisRdf::PROPERTY_USER_PASSWORD, '');
             $kvStore->getDriver()->hset($this->login,
                 'parameters',
                 json_encode(array(
@@ -66,7 +67,7 @@ class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
     public function testAuthenticate()
     {
         $user = $this->adapter->authenticate();
-        $this->assertEquals( $user->getPropertyValues(PROPERTY_USER_LOGIN), array($this->login));
+        $this->assertEquals( $user->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN), array($this->login));
     }
 
 
@@ -105,4 +106,3 @@ class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
     }
 
 }
- 

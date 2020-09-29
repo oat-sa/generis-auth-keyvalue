@@ -22,24 +22,21 @@ Once it's done, run a composer update.
 
 ------------------------------
 
-To enable them, you need to add the AuthKeyValueAdapter to your **config/generis/auth.conf.php**:
-
-    return array(
-        0 => array(
-            'driver' => 'oat\\authKeyValue\\AuthKeyValueAdapter',
-        ),
-        1 => array(
-            'driver' => 'oat\\generis\\model\\user\\AuthAdapter'
-        ),
-    );
-
-Then the login will try to use this library. 
-
-Be sure you have enable  the persistence in **config/generis/persistences.conf.php** by adding:
+Be sure to have a key value persistence registered that will be used for caching. The default persistence identifier is `authKeyValue`, but you will be able to configure which one will be used. Here is an example of registered redis persistence in **config/generis/persistences.conf.php**:
 
     'authKeyValue' => array(
-	    'driver' => 'phpredis',
-            'host' => '127.0.0.1',
-            'port' => 6379
-	)
+        'driver' => 'phpredis',
+        'host' => '127.0.0.1',
+        'port' => 6379
+    )
+
+------------------------------
+
+
+To enable the authentication cache you have to run an install script:
+
+    php index.php 'oat\authKeyValue\action\ActivateKeyValueAuthentication' --persistence authKeyValue
+
+
+Then the login will try to use this library.
 
