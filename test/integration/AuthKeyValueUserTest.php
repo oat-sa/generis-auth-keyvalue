@@ -6,7 +6,7 @@
  * Time: 10:49
  */
 
-namespace oat\authKeyValue\test;
+namespace oat\authKeyValue\test\integration;
 
 use oat\authKeyValue\AuthKeyValueUser;
 use GenerisPhpUnitTestRunner;
@@ -141,4 +141,3 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
     }
 
 }
- 

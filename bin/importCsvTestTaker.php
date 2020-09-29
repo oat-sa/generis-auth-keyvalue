@@ -2,6 +2,7 @@
 
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\authKeyValue\helpers\DataGeneration;
+use oat\oatbox\service\ServiceManager;
 use oat\taoGroups\models\GroupsService;
 use oat\generis\model\OntologyRdfs;
 use oat\generis\model\GenerisRdf;
@@ -81,7 +82,7 @@ $expected = array(
     'password' => GenerisRdf::PROPERTY_USER_PASSWORD,
 );
 $keys = array_keys($expected);
-$userService = new AuthKeyValueUserService();
+$userService = ServiceManager::getServiceManager()->get(AuthKeyValueUserService::SERVICE_ID);
 
 $row = 1;
 if (($handle = fopen($csvfile, "r")) !== false) {
