@@ -144,7 +144,7 @@ if (($handle = fopen($csvfile, "r")) !== false) {
                             'subject' => $userData['uri'],
                             'predicate' => OntologyRdfs::RDFS_LABEL,
                             'object' => $userData[GenerisRdf::PROPERTY_USER_LOGIN],
-                            'l_language' => $lang
+                            'l_language' => 'en-US'
                         )
                     );
                 } catch (PDOException $e) {
