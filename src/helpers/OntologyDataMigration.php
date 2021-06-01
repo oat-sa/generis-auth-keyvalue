@@ -21,6 +21,7 @@ namespace oat\authKeyValue\helpers;
 
 use core_kernel_classes_Resource;
 use oat\oatbox\service\ServiceManager;
+use oat\taoGroups\models\GroupsService;
 use tao_models_classes_UserService;
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\generis\model\GenerisRdf;
@@ -69,6 +70,9 @@ class OntologyDataMigration
                     break;
                 case GenerisRdf::PROPERTY_USER_LASTNAME :
                     $userData[GenerisRdf::PROPERTY_USER_LASTNAME] = $property->object;
+                    break;
+                case GroupsService::PROPERTY_MEMBERS_URI :
+                    $userData[GroupsService::PROPERTY_MEMBERS_URI][] = $property->object;
                     break;
                 default :
                     $userExtraData[$property->predicate] = $property->object;
