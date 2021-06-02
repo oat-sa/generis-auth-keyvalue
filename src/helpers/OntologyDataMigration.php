@@ -19,9 +19,9 @@
 
 namespace oat\authKeyValue\helpers;
 
+use core_kernel_classes_Property;
 use core_kernel_classes_Resource;
 use oat\oatbox\service\ServiceManager;
-use oat\taoGroups\models\GroupsService;
 use tao_models_classes_UserService;
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\generis\model\GenerisRdf;
@@ -46,36 +46,39 @@ class OntologyDataMigration
         $userData['uri'] = $userUri;
 
         $user = new core_kernel_classes_Resource($userUri);
-        foreach ($user->getRdfTriples() as $property) {
-            switch ($property->predicate) {
+        foreach ($user->getRdfTriples() as $rdfTriple) {
+            switch ($rdfTriple->predicate) {
                 case GenerisRdf::PROPERTY_USER_LOGIN :
-                    $userData[GenerisRdf::PROPERTY_USER_LOGIN] = $property->object;
-                    $login = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_LOGIN] = $rdfTriple->object;
+                    $login = $rdfTriple->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_PASSWORD :
-                    $userData[GenerisRdf::PROPERTY_USER_PASSWORD] = $property->object;
-                    $password = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_PASSWORD] = $rdfTriple->object;
+                    $password = $rdfTriple->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_ROLES :
-                    $userData[GenerisRdf::PROPERTY_USER_ROLES][] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_ROLES][] = $rdfTriple->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_UILG :
-                    $userData[GenerisRdf::PROPERTY_USER_UILG] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_UILG] = $rdfTriple->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_DEFLG :
-                    $userData[GenerisRdf::PROPERTY_USER_DEFLG] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_DEFLG] = $rdfTriple->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_FIRSTNAME :
-                    $userData[GenerisRdf::PROPERTY_USER_FIRSTNAME] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_FIRSTNAME] = $rdfTriple->object;
                     break;
                 case GenerisRdf::PROPERTY_USER_LASTNAME :
-                    $userData[GenerisRdf::PROPERTY_USER_LASTNAME] = $property->object;
-                    break;
-                case GroupsService::PROPERTY_MEMBERS_URI :
-                    $userData[GroupsService::PROPERTY_MEMBERS_URI][] = $property->object;
+                    $userData[GenerisRdf::PROPERTY_USER_LASTNAME] = $rdfTriple->object;
                     break;
                 default :
-                    $userExtraData[$property->predicate] = $property->object;
+                    $property = new core_kernel_classes_Property($rdfTriple->predicate);
+
+                    if ($property->isMultiple()) {
+                        $userExtraData[$rdfTriple->predicate][] = $rdfTriple->object;
+                    } else {
+                        $userExtraData[$rdfTriple->predicate] = $rdfTriple->object;
+                    }
             }
         }
 
