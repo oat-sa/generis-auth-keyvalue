@@ -60,7 +60,10 @@ class AuthKeyValueUserTest extends TestCase
 
     public function testGetPropertyValues_WhenExtraParamAccessedSecondTime_ThenItsReturnedFromCache()
     {
-        $this->authUserService->expects($this->once())->method('getUserParameter')->willReturn('extraValue');
+        $this->authUserService
+            ->expects($this->once())
+            ->method('getUserParameter')
+            ->willReturn(json_encode('extraValue'));
         $this->assertEquals(['extraValue'], $this->authUser->getPropertyValues('extraProperty'));
         $this->assertEquals(['extraValue'], $this->authUser->getPropertyValues('extraProperty'));
     }
@@ -68,7 +71,10 @@ class AuthKeyValueUserTest extends TestCase
     public function testGetPropertyValues_WhenExtraParamValueSizeExceedsLimit_ThenItsReadFromPersistence()
     {
         $this->authUser->setConfiguration(['max_size_cached_element' => 1]);
-        $this->authUserService->expects($this->exactly(2))->method('getUserParameter')->willReturn('extraValue');
+        $this->authUserService
+            ->expects($this->exactly(2))
+            ->method('getUserParameter')
+            ->willReturn(json_encode('extraValue'));
         $this->assertEquals(['extraValue'], $this->authUser->getPropertyValues('extraProperty'));
         $this->assertEquals(['extraValue'], $this->authUser->getPropertyValues('extraProperty'));
     }
@@ -84,5 +90,30 @@ class AuthKeyValueUserTest extends TestCase
         $this->authUser->setUserExtraParameters(['testExtraParam' => 'value']);
         $this->authUser->refresh();
         $this->assertEmpty($this->authUser->getUserExtraParameters());
+    }
+
+    public function testGetPropertyValues_WithParamAsArray_ThenItsReturnedFromCache()
+    {
+        $data = ['extraValue1', 'extraValue2'];
+
+        $this->authUserService
+            ->expects($this->once())
+            ->method('getUserParameter')
+            ->willReturn(json_encode($data));
+        $this->assertEquals($data, $this->authUser->getPropertyValues('extraProperty'));
+        $this->assertEquals($data, $this->authUser->getPropertyValues('extraProperty'));
+    }
+
+    public function testGetPropertyValues_WithParamAsArray_ThenItsReadFromPersistence()
+    {
+        $data = ['extraValue1', 'extraValue2'];
+
+        $this->authUser->setConfiguration(['max_size_cached_element' => 1]);
+        $this->authUserService
+            ->expects($this->exactly(2))
+            ->method('getUserParameter')
+            ->willReturn(json_encode($data));
+        $this->assertEquals($data, $this->authUser->getPropertyValues('extraProperty'));
+        $this->assertEquals($data, $this->authUser->getPropertyValues('extraProperty'));
     }
 }
