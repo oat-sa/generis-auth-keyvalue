@@ -233,7 +233,6 @@ class AuthKeyValueUser extends common_user_User {
                 } else {
                     $returnValue = $extraParameters[$property];
                 }
-
             } else {
                 // not already accessed, we are going to get it.
                 $login = reset($userParameters[GenerisRdf::PROPERTY_USER_LOGIN]);
@@ -247,6 +246,8 @@ class AuthKeyValueUser extends common_user_User {
                     $returnValue = array($value);
                 }
             }
+
+            $returnValue = json_decode(current($returnValue), true);
         }
 
         return $returnValue;
