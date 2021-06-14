@@ -159,7 +159,6 @@ class AuthKeyValueUser extends common_user_User {
         return $this->userRawParameters;
     }
 
-
     /**
      * @param mixed $language
      */
@@ -183,7 +182,6 @@ class AuthKeyValueUser extends common_user_User {
         return $this->languageUi;
     }
 
-
     /**
      * @return string
      */
@@ -200,7 +198,6 @@ class AuthKeyValueUser extends common_user_User {
 
         return $this;
     }
-
 
     /**
      * @param $property string
@@ -228,12 +225,7 @@ class AuthKeyValueUser extends common_user_User {
             $extraParameters = $this->getUserExtraParameters();
             // the element has already been accessed
             if(!empty($extraParameters) && array_key_exists($property, $extraParameters)){
-                if(!is_array($extraParameters[$property])){
-                    $returnValue = array($extraParameters[$property]);
-                } else {
-                    $returnValue = $extraParameters[$property];
-                }
-
+                $returnValue = array($extraParameters[$property]);
             } else {
                 // not already accessed, we are going to get it.
                 $login = reset($userParameters[GenerisRdf::PROPERTY_USER_LOGIN]);
@@ -247,11 +239,18 @@ class AuthKeyValueUser extends common_user_User {
                     $returnValue = array($value);
                 }
             }
+
+            if (!empty($returnValue)) {
+                $returnValue = json_decode(current($returnValue), true);
+
+                if (!is_array($returnValue)) {
+                    $returnValue = [$returnValue];
+                }
+            }
         }
 
         return $returnValue;
     }
-
 
     /**
      * Function that will refresh the parameters.
