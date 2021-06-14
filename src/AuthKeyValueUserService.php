@@ -84,7 +84,7 @@ class AuthKeyValueUserService extends ConfigurableService
             $this->getPersistence()->hSet(
                 $this->getParameterStorageKey($login),
                 $property,
-                $value
+                json_encode($value)
             );
         }
     }
