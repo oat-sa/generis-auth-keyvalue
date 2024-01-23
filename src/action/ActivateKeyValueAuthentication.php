@@ -34,6 +34,7 @@ use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\oatbox\user\auth\AuthFactory;
 use oat\tao\model\event\UserRemovedEvent;
 use oat\tao\model\event\UserUpdatedEvent;
+use oat\generis\model\data\event\ResourceUpdated;
 
 class ActivateKeyValueAuthentication extends ScriptAction
 {
@@ -123,6 +124,7 @@ class ActivateKeyValueAuthentication extends ScriptAction
     private function registerUserEventListener(): void
     {
         $this->registerEvent(UserUpdatedEvent::class, [UserEventListener::class, 'userUpdated']);
+        $this->registerEvent(ResourceUpdated::class, [UserEventListener::class, 'userUpdated']);
         $this->registerEvent(UserRemovedEvent::class, [UserEventListener::class, 'userRemoved']);
 
         $this->report->add(common_report_Report::createSuccess('User update/remove event listeners registered.'));
