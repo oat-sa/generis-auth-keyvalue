@@ -60,7 +60,7 @@ class UserEventListener extends ConfigurableService
         /** @var core_kernel_classes_Resource $userType */
         $userType = $resource->getOnePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_TYPE));
         // check if the resource is a user
-        if ($userType->getUri() === TaoOntology::CLASS_URI_TAO_USER) {
+        if ($userType && $userType->getUri() === TaoOntology::CLASS_URI_TAO_USER) {
             OntologyDataMigration::cacheUser($resource->getUri());
         }
     }
