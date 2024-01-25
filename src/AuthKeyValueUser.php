@@ -32,8 +32,6 @@ namespace oat\authKeyValue;
 use common_user_User;
 use core_kernel_classes_Resource;
 use core_kernel_classes_Property;
-use common_Logger;
-use Exception;
 use oat\generis\model\OntologyRdf;
 use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ServiceManager;
@@ -160,26 +158,13 @@ class AuthKeyValueUser extends common_user_User {
     }
 
     /**
-     * @param mixed $language
-     */
-    public function setLanguageUi($languageUri)
-    {
-        $languageResource = new core_kernel_classes_Resource($languageUri);
-
-        $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_VALUE));
-        if($languageCode) {
-            $this->languageUi = array((string)$languageCode);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
-    public function getLanguageUi()
+    public function getLanguageUiFromParams($params)
     {
-        return $this->languageUi;
+        $languageResource = new core_kernel_classes_Resource($params[GenerisRdf::PROPERTY_USER_UILG]);
+        $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_VALUE));
+        return array((string)$languageCode);
     }
 
     /**
@@ -216,7 +201,8 @@ class AuthKeyValueUser extends common_user_User {
                     $returnValue = $this->getLanguageDefLg();
                     break;
                 case GenerisRdf::PROPERTY_USER_UILG :
-                    $returnValue = $this->getLanguageUi();
+                    $params = $this->getKeyValueUserData();
+                    $returnValue = $this->getLanguageUiFromParams($params);
                     break;
                 default:
                     $returnValue = $userParameters[$property];
@@ -257,12 +243,7 @@ class AuthKeyValueUser extends common_user_User {
      */
     public function refresh() {
         $this->setUserExtraParameters([]);
-
-        $login = current($this->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN));
-        $userData = $this->getAuthKeyValueUserService()->getUserData($login);
-
-        $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
-        $this->setUserRawParameters($params);
+        $this->setUserRawParameters($this->getKeyValueUserData());
     }
 
     protected function getMaxCacheSize() {
@@ -276,5 +257,15 @@ class AuthKeyValueUser extends common_user_User {
     protected function getAuthKeyValueUserService()
     {
         return ServiceManager::getServiceManager()->get(AuthKeyValueUserService::SERVICE_ID);
+    }
+
+    /**
+     * @return array
+     */
+    private function getKeyValueUserData() {
+        $login = current($this->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN));
+        $userData = $this->getAuthKeyValueUserService()->getUserData($login);
+        $params = json_decode($userData[AuthKeyValueUserService::USER_PARAMETERS],true);
+        return $params;
     }
 }

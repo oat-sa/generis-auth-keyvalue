@@ -31,7 +31,6 @@ namespace oat\authKeyValue;
 
 use core_kernel_users_Service;
 use core_kernel_users_InvalidLoginException;
-use core_kernel_users_AuthAdapter;
 use oat\oatbox\service\ServiceManager;
 use oat\oatbox\user\auth\LoginAdapter;
 use oat\oatbox\Configurable;
@@ -91,9 +90,6 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
             $user = new AuthKeyValueUser();
             $user->setConfiguration($this->getOptions());
             $user->setIdentifier($params['uri']);
-            if (isset($params[GenerisRdf::PROPERTY_USER_UILG])) {
-                $user->setLanguageUi($params[GenerisRdf::PROPERTY_USER_UILG]);
-            }
             if (isset($params[GenerisRdf::PROPERTY_USER_DEFLG])) {
                 $user->setLanguageDefLg($params[GenerisRdf::PROPERTY_USER_DEFLG]);
             }
