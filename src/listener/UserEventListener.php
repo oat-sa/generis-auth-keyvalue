@@ -34,7 +34,6 @@ use oat\tao\model\TaoOntology;
 class UserEventListener extends ConfigurableService
 {
     /**
-     * @param UserUpdatedEvent|ResourceUpdated $event
      * @throws common_exception_Error
      */
     public function userUpdated(UserUpdatedEvent|ResourceUpdated $event)
