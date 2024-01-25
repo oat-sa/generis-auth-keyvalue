@@ -21,23 +21,46 @@ namespace oat\authKeyValue\listener;
 
 use common_exception_Error;
 use core_kernel_classes_Resource;
+use core_kernel_classes_Property;
 use oat\authKeyValue\AuthKeyValueUserService;
 use oat\authKeyValue\helpers\OntologyDataMigration;
+use oat\generis\model\data\event\ResourceUpdated;
 use oat\oatbox\service\ConfigurableService;
 use oat\tao\model\event\UserRemovedEvent;
 use oat\tao\model\event\UserUpdatedEvent;
+use oat\generis\model\OntologyRdf;
+use oat\tao\model\TaoOntology;
 
 class UserEventListener extends ConfigurableService
 {
     /**
-     * @param UserUpdatedEvent $event
      * @throws common_exception_Error
      */
-    public function userUpdated(UserUpdatedEvent $event)
+    public function userUpdated(UserUpdatedEvent|ResourceUpdated $event)
+    {
+        if ($event instanceof UserUpdatedEvent) {
+            $this->handleUserUpdatedEvent($event);
+        } else {
+            $this->handleResourceUpdatedEvent($event);
+        }
+    }
+    
+    private function handleUserUpdatedEvent(UserUpdatedEvent $event)
     {
         $eventData = $event->jsonSerialize();
         if (isset($eventData['uri'])) {
             OntologyDataMigration::cacheUser($eventData['uri']);
+        }
+    }
+    
+    private function handleResourceUpdatedEvent(ResourceUpdated $event)
+    {
+        $resource = $event->getResource();
+        /** @var core_kernel_classes_Resource $userType */
+        $userType = $resource->getOnePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_TYPE));
+        // check if the resource is a user
+        if ($userType && $userType->getUri() === TaoOntology::CLASS_URI_TAO_USER) {
+            OntologyDataMigration::cacheUser($resource->getUri());
         }
     }
 
