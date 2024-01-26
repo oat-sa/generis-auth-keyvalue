@@ -47,10 +47,7 @@ class AuthKeyValueUserService extends ConfigurableService
 
     private $persistence;
 
-    /**
-     * @return common_persistence_Persistence
-     */
-    protected function getPersistence()
+    protected function getPersistence(): common_persistence_Persistence
     {
         if (empty($this->persistence)) {
             $persistenceId = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;
@@ -64,13 +61,15 @@ class AuthKeyValueUserService extends ConfigurableService
     }
 
     /**
-     * @param string $login
-     * @param string $password
-     * @param array $data
-     * @param array $extraParams
      * @throws common_Exception
      */
-    public function storeUserData($uri, $login, $password, array $data, array $extraParams = [])
+    public function storeUserData(
+        string $uri,
+        string $login,
+        string $password,
+        array $data,
+        array $extraParams = []
+        )
     {
         if (empty($login) || empty($password)) {
             return;
@@ -89,18 +88,12 @@ class AuthKeyValueUserService extends ConfigurableService
         }
     }
 
-    /**
-     * @param $login
-     * @return mixed
-     */
-    public function getUserData($login){
+    public function getUserData(string $login): mixed
+    {
         return $this->getPersistence()->hGetAll($this->getStorageKey($login));
     }
 
-    /**
-     * @param string $userUri
-     */
-    public function removeUserData($userUri)
+    public function removeUserData(string $userUri): void
     {
         $login = $this->findUserLoginFromUri($userUri);
         if (empty($login)) {
@@ -111,60 +104,37 @@ class AuthKeyValueUserService extends ConfigurableService
         $this->getPersistence()->del($this->getUriMapKey($userUri));
     }
 
-    /**
-     * @param $userLogin string
-     * @param $parameter string
-     * @return mixed
-     */
-    public function getUserParameter($userLogin, $parameter){
+    public function getUserParameter(string $userLogin, string $parameter): mixed
+    {
         return $this->getPersistence()->hGet($this->getParameterStorageKey($userLogin), $parameter);
     }
 
-    /**
-     * @param $userLogin string user login
-     * @param $parameter string parameter
-     * @param $value mixed
-     */
-    public function setUserParameter($userLogin, $parameter, $value){
+    public function setUserParameter(string $userLogin, string $parameter, mixed $value)
+    {
         $this->getPersistence()->hSet($this->getParameterStorageKey($userLogin), $parameter, $value);
     }
 
-    private function findUserLoginFromUri($userUri)
+    private function findUserLoginFromUri($userUri): mixed
     {
         return $this->getPersistence()->get($this->getUriMapKey($userUri));
     }
 
-    /**
-     * @param string $login
-     * @return string
-     */
-    private function getStorageKey($login)
+    private function getStorageKey(string $login): string
     {
         return self::PREFIXES_KEY . ':' . $login;
     }
 
-    /**
-     * @param string $login
-     * @return string
-     */
-    private function getParameterStorageKey($login)
+    private function getParameterStorageKey(string $login): string
     {
         return $this->getStorageKey($login) . ':' . self::USER_EXTRA_PARAMETERS;
     }
 
-    /**
-     * @param string $userUri
-     * @return string
-     */
-    private function getUriMapKey($userUri)
+    private function getUriMapKey(string $userUri): string
     {
         return self::PREFIXES_KEY . ':' . $userUri;
     }
 
-    /**
-     * @return common_persistence_Manager
-     */
-    private function getPersistenceManager()
+    private function getPersistenceManager(): common_persistence_Manager
     {
         return $this->getServiceLocator()->get(common_persistence_Manager::SERVICE_ID);
     }

@@ -37,7 +37,7 @@ class DataGeneration {
     /**
      * Function that will generate key value user in redis database
      */
-    public static function generateKeyValueUser()
+    public static function generateKeyValueUser(): void
     {
         $generationId = substr( md5(rand()), 0, 3);
 
@@ -63,7 +63,7 @@ class DataGeneration {
         }
     }
     
-    public static function createUser($data = array(), $lang = null, $uri = null)
+    public static function createUser(?array $data, ?string $lang, ?string $uri): array
     {
         if (!isset($data[GenerisRdf::PROPERTY_USER_LOGIN]) || !isset($data[GenerisRdf::PROPERTY_USER_PASSWORD])) {
             throw new \common_exception_InconsistentData('Cannot add user without login or password');

@@ -47,27 +47,18 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
     /** default key used to retrieve the persistence information */
     CONST KEY_VALUE_PERSISTENCE_ID = 'authKeyValue';
 
-    /** @var  $username string */
-    private $username;
-
-    /** @var  $password string */
-    private $password;
+    private string $username;
+    private string $password;
 
     /**
      * Set the credential
-     *
-     * @param string $login
-     * @param string $password
      */
-    public function setCredentials($login, $password){
+    public function setCredentials(string $login, string $password){
         $this->username = $login;
         $this->password = $password;
     }
 
-    /**
-     * @return array
-     */
-    public function getConfiguration()
+    public function getConfiguration(): array
     {
         return $this->getOptions();
     }
@@ -103,10 +94,7 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
 
     }
 
-    /**
-     * @return AuthKeyValueUserService
-     */
-    protected function getAuthKeyValueUserService()
+    protected function getAuthKeyValueUserService(): AuthKeyValueUserService
     {
         return ServiceManager::getServiceManager()->get(AuthKeyValueUserService::SERVICE_ID);
     }

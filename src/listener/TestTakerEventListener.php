@@ -27,7 +27,7 @@ use oat\taoTestTaker\models\events\TestTakerRemovedEvent;
 
 class TestTakerEventListener extends ConfigurableService
 {
-    public function testTakerUpdated(AbstractTestTakerEvent $event)
+    public function testTakerUpdated(AbstractTestTakerEvent $event): void
     {
         $eventData = $event->jsonSerialize();
         if (isset($eventData['testTakerUri'])) {
@@ -35,7 +35,7 @@ class TestTakerEventListener extends ConfigurableService
         }
     }
 
-    public function testTakerRemoved(TestTakerRemovedEvent $event)
+    public function testTakerRemoved(TestTakerRemovedEvent $event): void
     {
         $eventData = $event->jsonSerialize();
         if (isset($eventData['testTakerUri'])) {
@@ -43,10 +43,7 @@ class TestTakerEventListener extends ConfigurableService
         }
     }
 
-    /**
-     * @return AuthKeyValueUserService
-     */
-    protected function getAuthKeyValueUserService()
+    protected function getAuthKeyValueUserService(): AuthKeyValueUserService
     {
         return $this->getServiceLocator()->get(AuthKeyValueUserService::SERVICE_ID);
     }

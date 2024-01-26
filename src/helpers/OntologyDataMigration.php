@@ -29,7 +29,7 @@ use oat\generis\model\GenerisRdf;
 class OntologyDataMigration
 {
 
-    public static function cacheAllUsers($persistenceId = null)
+    public static function cacheAllUsers(?string $persistenceId): void
     {
         $service = tao_models_classes_UserService::singleton();
         $users = $service->getAllUsers();
@@ -39,7 +39,7 @@ class OntologyDataMigration
         }
     }
 
-    public static function cacheUser($userUri, $persistenceId = null)
+    public static function cacheUser(string $userUri, ?string $persistenceId): void
     {
         $userData = [];
         $userExtraData = [];
