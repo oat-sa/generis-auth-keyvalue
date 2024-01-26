@@ -28,8 +28,8 @@
 namespace oat\authKeyValue;
 
 use common_Exception;
+use common_persistence_AdvKeyValuePersistence;
 use common_persistence_Manager;
-use common_persistence_Persistence;
 use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ConfigurableService;
 
@@ -47,7 +47,7 @@ class AuthKeyValueUserService extends ConfigurableService
 
     private $persistence;
 
-    protected function getPersistence(): common_persistence_Persistence
+    protected function getPersistence(): common_persistence_AdvKeyValuePersistence
     {
         if (empty($this->persistence)) {
             $persistenceId = AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID;

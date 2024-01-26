@@ -53,7 +53,8 @@ class AuthKeyValueAdapter extends Configurable implements LoginAdapter
     /**
      * Set the credential
      */
-    public function setCredentials(string $login, string $password){
+    public function setCredentials($login, $password): void
+    {
         $this->username = $login;
         $this->password = $password;
     }

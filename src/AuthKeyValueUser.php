@@ -139,7 +139,7 @@ class AuthKeyValueUser extends common_user_User {
         return $this;
     }
 
-    public function getPropertyValues(string $property): ?array
+    public function getPropertyValues($property): ?array
     {
         $returnValue = array();
 
