@@ -30,6 +30,7 @@ namespace oat\authKeyValue;
 use common_Exception;
 use common_persistence_AdvKeyValuePersistence;
 use common_persistence_Manager;
+use oat\generis\persistence\PersistenceManager;
 use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ConfigurableService;
 
@@ -134,7 +135,7 @@ class AuthKeyValueUserService extends ConfigurableService
         return self::PREFIXES_KEY . ':' . $userUri;
     }
 
-    private function getPersistenceManager(): common_persistence_Manager
+    private function getPersistenceManager(): PersistenceManager
     {
         return $this->getServiceLocator()->get(common_persistence_Manager::SERVICE_ID);
     }
