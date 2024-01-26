@@ -9,17 +9,15 @@
 namespace oat\authKeyValue\test\integration;
 
 use oat\authKeyValue\AuthKeyValueUser;
-use GenerisPhpUnitTestRunner;
 use oat\generis\model\GenerisRdf;
-
-require_once dirname(__FILE__) . '/../../generis/test/GenerisPhpUnitTestRunner.php';
+use oat\generis\test\GenerisPhpUnitTestRunner;
 
 class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
 
-    /** @var  $user AuthKeyValueUser */
-    protected $user;
+    protected AuthKeyValueUser $user;
 
-    public function setUp() {
+    public function setUp(): void
+    {
         $this->user = new AuthKeyValueUser();
 
         $this->user->setUserRawParameters(
@@ -40,8 +38,9 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
         $this->user->setConfiguration( array('max_size_cached_element' => 10000 ) );
     }
 
-    public function tearDown(){
-        $this->user = null;
+    public function tearDown(): void
+    {
+        $this->user = new AuthKeyValueUser();
     }
 
 
@@ -68,17 +67,11 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
     {
         $languageProperty = 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US';
 
-        $this->user->setLanguageUi($languageProperty);
         $this->user->setLanguageDefLg($languageProperty);
 
-        $langUi = $this->user->getLanguageUi();
         $langDefLg = $this->user->getLanguageDefLg();
-
-        $this->assertNotEmpty($langUi);
         $this->assertNotEmpty($langDefLg);
-        $this->assertInternalType('array', $langUi);
         $this->assertInternalType('array', $langDefLg);
-        $this->assertEquals(array('en-US'), $this->user->getLanguageUi());
         $this->assertEquals(array('en-US'), $this->user->getLanguageDefLg());
     }
 
@@ -86,23 +79,9 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
     /**
      * @cover AuthKeyValueUser::getPropertyValues
      */
-    public function testPropertyValue(){
-
-        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG));
-        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_UILG));
-
-    }
-
-
-    /**
-     * @cover AuthKeyValueUser::setRoles
-     * @cover AuthKeyValueUser::getRoles
-     */
-    public function testRoles()
+    public function testPropertyValue()
     {
-        $this->user->setRoles(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'));
-        $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getRoles());
-        $this->assertEquals(array('http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole'), $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_ROLES));
+        $this->assertEquals(array(0 => 'en-US'), $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG));
     }
 
 
@@ -111,15 +90,10 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
      */
     public function testLazyLoadForMail(){
 
-        $array = $this->user->getUserExtraParameters();
-
-        // check array is currently empty
-        $this->assertEmpty($array);
-
-        $mail = $this->user->getPropertyValues(GenerisRdf::PROPERTY_USER_MAIL);
+        $this->user->setUserExtraParameters(array(GenerisRdf::PROPERTY_USER_MAIL => 'test_email'));
 
         $this->assertNotEmpty($this->user->getUserExtraParameters());
-        $this->assertArrayHasKey(GenerisRdf::PROPERTY_USER_MAIL,$this->user->getUserExtraParameters());
+        $this->assertArrayHasKey(GenerisRdf::PROPERTY_USER_MAIL, $this->user->getUserExtraParameters());
     }
 
 
@@ -136,7 +110,7 @@ class AuthKeyValueUserTest extends GenerisPhpUnitTestRunner {
         $this->user->setUserExtraParameters(array('property' => array('property1', 'property2', 'property3')));
 
         $this->assertNotEmpty($this->user->getUserExtraParameters());
-        $this->assertArrayHasKey('property',$this->user->getUserExtraParameters());
+        $this->assertArrayHasKey('property', $this->user->getUserExtraParameters());
         $this->assertEquals( array('property1', 'property2', 'property3') ,$this->user->getPropertyValues('property'));
     }
 

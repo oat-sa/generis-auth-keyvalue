@@ -122,9 +122,12 @@ class AuthKeyValueUser extends common_user_User {
 
     public function getLanguageUiFromParams($params): array
     {
-        $languageResource = new core_kernel_classes_Resource($params[GenerisRdf::PROPERTY_USER_UILG]);
-        $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_VALUE));
-        return array((string)$languageCode);
+        if (isset($params[GenerisRdf::PROPERTY_USER_UILG])) {
+            $languageResource = new core_kernel_classes_Resource($params[GenerisRdf::PROPERTY_USER_UILG]);
+            $languageCode = $languageResource->getUniquePropertyValue(new core_kernel_classes_Property(OntologyRdf::RDF_VALUE));
+            return [(string)$languageCode];
+        }
+        return [];
     }
 
     public function getIdentifier(): string
@@ -177,8 +180,13 @@ class AuthKeyValueUser extends common_user_User {
             }
 
             if (!empty($returnValue)) {
-                $returnValue = json_decode(current($returnValue), true);
-
+                if (is_array($returnValue)) {
+                    $current = current($returnValue);
+                    $returnValue = $current;
+                    if (is_string($current)) {
+                        $returnValue = json_decode($current, true);
+                    }
+                }
                 if (!is_array($returnValue)) {
                     $returnValue = [$returnValue];
                 }
@@ -212,6 +220,7 @@ class AuthKeyValueUser extends common_user_User {
     {
         $params = [];
         $login = current($this->getPropertyValues(GenerisRdf::PROPERTY_USER_LOGIN));
+        
         if ($login) {
             $userData = $this->getAuthKeyValueUserService()->getUserData($login);
             if (isset($userData[AuthKeyValueUserService::USER_PARAMETERS])) {
