@@ -147,17 +147,16 @@ class AuthKeyValueUser extends common_user_User {
 
         if( !empty($userParameters) && array_key_exists($property, $userParameters))
         {
-            switch ($property) {
-                case GenerisRdf::PROPERTY_USER_DEFLG :
-                    $returnValue = $this->getLanguageDefLg();
-                    break;
-                case GenerisRdf::PROPERTY_USER_UILG :
-                    $params = $this->getKeyValueUserData();
-                    $returnValue = $this->getLanguageUiFromParams($params);
-                    break;
-                default:
-                    $returnValue = $userParameters[$property];
+            try {
+                $returnValue = match ($property) {
+                    GenerisRdf::PROPERTY_USER_DEFLG => $this->getLanguageDefLg(),
+                    GenerisRdf::PROPERTY_USER_UILG => $this->getLanguageUiFromParams($this->getKeyValueUserData()),
+                    default => $userParameters[$property],
+                };
+            }  catch (\UnhandledMatchError $e) {
+                $returnValue = $userParameters[$property];
             }
+           
         } else {
             $extraParameters = $this->getUserExtraParameters();
             // the element has already been accessed
