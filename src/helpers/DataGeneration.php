@@ -37,7 +37,7 @@ class DataGeneration {
     /**
      * Function that will generate key value user in redis database
      */
-    public static function generateKeyValueUser()
+    public static function generateKeyValueUser(): void
     {
         $generationId = substr( md5(rand()), 0, 3);
 
@@ -63,7 +63,7 @@ class DataGeneration {
         }
     }
     
-    public static function createUser($data = array(), $lang = null, $uri = null)
+    public static function createUser(array $data = [], ?string $lang = null, ?string $uri = null): array
     {
         if (!isset($data[GenerisRdf::PROPERTY_USER_LOGIN]) || !isset($data[GenerisRdf::PROPERTY_USER_PASSWORD])) {
             throw new \common_exception_InconsistentData('Cannot add user without login or password');
@@ -85,7 +85,7 @@ class DataGeneration {
         $data = array_merge($defaultData, $data);
         
         $data['uri'] = (empty($uri)) ? \common_Utils::getNewUri() : $uri;
-        
+        /** @var common_persistence_AdvKeyValuePersistence $kvStore */
         $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
         $kvStore->hset(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, GenerisRdf::PROPERTY_USER_PASSWORD, $password);
         $kvStore->hset(AuthKeyValueUserService::PREFIXES_KEY.':'.$login, 'parameters', json_encode($data) );

@@ -9,35 +9,36 @@
 namespace oat\authKeyValue\test\integration;
 
 use oat\authKeyValue\AuthKeyValueAdapter;
-use oat\authKeyValue\AuthKeyValueUser;
-use GenerisPhpUnitTestRunner;
-use common_session_SessionManager;
+use oat\generis\test\GenerisPhpUnitTestRunner;
 use common_persistence_AdvKeyValuePersistence;
 use core_kernel_users_Service;
-use common_Utils;
 use oat\generis\model\GenerisRdf;
+use oat\oatbox\cache\KeyValueCache;
 
-require_once dirname(__FILE__) . '/../../generis/test/GenerisPhpUnitTestRunner.php';
-
-class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
-
-
-    protected $adapter;
+class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner
+{
+    protected AuthKeyValueAdapter $adapter;
     protected $login;
     protected $password;
+   
 
-    public function setUp() {
+    /**
+     * @var KeyValueCache
+     */
+    protected $cache;
+
+    public function setUp(): void
+    {
 
         $this->login = 'helloworld1';
         $this->password = 'password1';
-
+       
         $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
         $user = $kvStore->getDriver()->hGetAll($this->login);
-
         if ( ! $user ){
 
             $uri = \common_Utils::getNewUri();
-            $kvStore->getDriver()->hset($this->login,GenerisRdf::PROPERTY_USER_PASSWORD, '');
+            $kvStore->getDriver()->hset($this->login, GenerisRdf::PROPERTY_USER_PASSWORD, $this->password);
             $kvStore->getDriver()->hset($this->login,
                 'parameters',
                 json_encode(array(
@@ -88,7 +89,7 @@ class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
      */
     public function testSetConfiguration()
     {
-        $this->adapter->setConfiguration( array('pika' => 'tchu'));
+        $this->adapter->setOptions( array('pika' => 'tchu'));
         $config = $this->adapter->getConfiguration();
 
         $this->assertInternalType('array', $config);
@@ -98,7 +99,7 @@ class AuthKeyValueAdapterTest extends GenerisPhpUnitTestRunner {
 
 
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $kvStore = common_persistence_AdvKeyValuePersistence::getPersistence(AuthKeyValueAdapter::KEY_VALUE_PERSISTENCE_ID);
 
