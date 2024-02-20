@@ -35,8 +35,9 @@ use core_kernel_classes_Property;
 use oat\generis\model\OntologyRdf;
 use oat\generis\model\GenerisRdf;
 use oat\oatbox\service\ServiceManager;
+use oat\generis\model\kernel\users\UserInternalInterface;
 
-class AuthKeyValueUser extends common_user_User {
+class AuthKeyValueUser extends common_user_User implements UserInternalInterface{
 
     /**
      * Max size of a property to store in the session in characters
