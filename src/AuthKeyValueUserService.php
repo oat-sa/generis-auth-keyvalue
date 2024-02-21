@@ -65,9 +65,9 @@ class AuthKeyValueUserService extends ConfigurableService
      * @throws common_Exception
      */
     public function storeUserData(
-        string $uri,
-        string $login,
-        string $password,
+        ?string $uri,
+        ?string $login,
+        ?string $password,
         array $data,
         array $extraParams = []
         )
